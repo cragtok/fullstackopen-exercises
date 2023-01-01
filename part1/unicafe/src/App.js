@@ -1,5 +1,15 @@
 import { useState } from "react";
 
+const Button = ({ text, handleClick }) => {
+    return <button onClick={handleClick}>{text}</button>;
+};
+
+const StatisticLine = ({ text, number }) => (
+    <p>
+        {text} {number}
+    </p>
+);
+
 const Statistics = ({ statistics }) => {
     if (statistics.good + statistics.bad + statistics.neutral === 0) {
         return (
@@ -13,12 +23,18 @@ const Statistics = ({ statistics }) => {
     return (
         <div>
             <h1>statistics</h1>
-            <p>good {statistics.good}</p>
-            <p>neutral {statistics.neutral}</p>
-            <p>bad {statistics.bad}</p>
-            <p>all {statistics.good + statistics.bad + statistics.neutral}</p>
-            <p>average {statistics.average}</p>
-            <p>positive {statistics.positivePercentage}</p>
+            <StatisticLine text="good" number={statistics.good} />
+            <StatisticLine text="neutral" number={statistics.neutral} />
+            <StatisticLine text="bad" number={statistics.bad} />
+            <StatisticLine
+                text="all"
+                number={statistics.good + statistics.bad + statistics.neutral}
+            />
+            <StatisticLine text="average" number={statistics.average} />
+            <StatisticLine
+                text="positive"
+                number={statistics.positivePercentage}
+            />
         </div>
     );
 };
@@ -34,9 +50,9 @@ const App = () => {
     return (
         <div>
             <h1>give feedback</h1>
-            <button onClick={() => setGood(good + 1)}>good</button>
-            <button onClick={() => setNeutral(neutral + 1)}>neutral</button>
-            <button onClick={() => setBad(bad + 1)}>bad</button>
+            <Button handleClick={() => setGood(good + 1)} text="good" />
+            <Button handleClick={() => setNeutral(neutral + 1)} text="neutral" />
+            <Button handleClick={() => setBad(bad + 1)} text="bad" />
             <Statistics
                 statistics={{ good, neutral, bad, average, positivePercentage }}
             />
