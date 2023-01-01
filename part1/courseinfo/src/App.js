@@ -1,16 +1,27 @@
+const Part = (props) => {
+    return (
+        <p>
+            {props.part} {props.exercises}
+        </p>
+    );
+};
+
 const Content = (props) => {
     return (
-        <>
-            <p>
-                {props.content.part1} {props.content.exercises1}
-            </p>
-            <p>
-                {props.content.part2} {props.content.exercises2}
-            </p>
-            <p>
-                {props.content.part3} {props.content.exercises3}
-            </p>
-        </>
+        <div>
+            <Part
+                part={props.content.part1}
+                exercise={props.content.exercises1}
+            />
+            <Part
+                part={props.content.part2}
+                exercise={props.content.exercises2}
+            />
+            <Part
+                part={props.content.part3}
+                exercise={props.content.exercises3}
+            />
+        </div>
     );
 };
 
