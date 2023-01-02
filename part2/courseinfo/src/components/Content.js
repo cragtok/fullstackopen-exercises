@@ -1,6 +1,5 @@
 import Part from "./Part";
 const Content = ({ content }) => {
-    const totalExercises = content.reduce((acc, obj) => acc + obj.exercises, 0);
     return (
         <>
             {content.map((course) => (
@@ -11,7 +10,8 @@ const Content = ({ content }) => {
                 />
             ))}
             <p style={{ fontWeight: "bold" }}>
-                Total of {totalExercises} courses
+                Total of {content.reduce((acc, obj) => acc + obj.exercises, 0)}{" "}
+                courses
             </p>
         </>
     );
