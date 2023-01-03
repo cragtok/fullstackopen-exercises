@@ -4,13 +4,11 @@ import axios from "axios";
 function App() {
     const [query, setQuery] = useState("");
     const [countries, setCountries] = useState([]);
+    const [displayedCountry, setDisplayedCountry] = useState(null);
 
     const filteredCountries = countries.filter((country) =>
         country.name.common.toLowerCase().includes(query.toLowerCase())
     );
-
-    const foundCountry =
-        filteredCountries.length === 1 ? filteredCountries[0] : null;
 
     useEffect(() => {
         axios
@@ -25,23 +23,28 @@ function App() {
             {filteredCountries.length <= 10 &&
                 filteredCountries.length > 1 &&
                 filteredCountries.map((country) => (
-                    <p key={country.cca2}>{country.name.common}</p>
+                    <div key={country.cca2}>
+                        {country.name.common+" "}
+                        <button onClick={() => setDisplayedCountry(country)}>
+                            show
+                        </button>
+                    </div>
                 ))}
             {query && filteredCountries.length >= 11 && (
                 <p>"Too many matches, specify another filter."</p>
             )}
-            {foundCountry && (
+            {displayedCountry && (
                 <div>
-                    <h2>{foundCountry.name.common}</h2>
-                    <p>capital {foundCountry.capital[0]}</p>
-                    <p>area {foundCountry.area}</p>
+                    <h2>{displayedCountry.name.common}</h2>
+                    <p>capital {displayedCountry.capital[0]}</p>
+                    <p>area {displayedCountry.area}</p>
                     <h3>languages </h3>
-                    {Object.keys(foundCountry.languages).map((key) => (
-                        <li key={key}>{foundCountry.languages[key]}</li>
+                    {Object.keys(displayedCountry.languages).map((key) => (
+                        <li key={key}>{displayedCountry.languages[key]}</li>
                     ))}
                     <img
-                        src={foundCountry.flags.png}
-                        alt={`${foundCountry.name.common} flag`}
+                        src={displayedCountry.flags.png}
+                        alt={`${displayedCountry.name.common} flag`}
                     />
                 </div>
             )}
