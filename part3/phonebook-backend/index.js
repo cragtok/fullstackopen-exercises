@@ -47,8 +47,15 @@ app.post("/api/persons", (request, response) => {
     const body = request.body;
 
     if (!body.name || !body.number) {
-        return response.status(404).json({
-            error: "body missing",
+        return response.status(400).json({
+            error: "name or number missing",
+        });
+    }
+
+    const duplicatePerson = persons.find((p) => p.name === body.name);
+    if (duplicatePerson) {
+        return response.status(400).json({
+            error: `Person with name ${body.name} already exists in phonebook`,
         });
     }
     const randomIntFromInterval = (min, max) => {
