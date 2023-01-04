@@ -3,14 +3,19 @@ import { useState, useEffect } from "react";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
+import Notification from "./components/Notification";
 
 import personsService from "./services/persons";
+
+import "./index.css";
 
 const App = () => {
     const [persons, setPersons] = useState([]);
     const [newName, setNewName] = useState("");
     const [newNumber, setNewNumber] = useState("");
     const [filter, setFilter] = useState("");
+    const [notificationMessage, setNotificationMessage] = useState("");
+    const [notificationType, setNotificationType] = useState("");
 
     useEffect(() => {
         console.log("effect");
@@ -23,6 +28,15 @@ const App = () => {
             .catch((err) => console.error(err));
     }, []);
     console.log("Rendered ", persons.length, " persons");
+
+    const showNotification = (message, type) => {
+        setNotificationMessage(message);
+        setNotificationType(type);
+        setTimeout(() => {
+            setNotificationMessage("");
+            setNotificationType("");
+        }, 3000);
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -53,7 +67,10 @@ const App = () => {
                         person.id === updatedPerson.id ? updatedPerson : person
                     )
                 );
-                console.log(updatedPerson);
+                showNotification(
+                    `Updated ${updatedPerson.name} with new number ${updatedPerson.number}`,
+                    "success"
+                );
             })
             .catch((err) => console.error(err));
     };
@@ -65,10 +82,10 @@ const App = () => {
                 number,
             })
             .then((newPerson) => {
-                console.log(newPerson);
                 setPersons([...persons, newPerson]);
                 setNewName("");
                 setNewNumber("");
+                showNotification(`Added ${newPerson.name}`, "success");
             })
             .catch((err) => console.error(err));
     };
@@ -94,6 +111,10 @@ const App = () => {
     return (
         <div>
             <h2>Phonebook</h2>
+            <Notification
+                message={notificationMessage}
+                type={notificationType}
+            />
             <Filter filter={filter} handleFilterChange={handleFilterChange} />
             <h3>add a new</h3>
             <PersonForm
