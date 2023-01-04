@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
 
+app.use(express.json());
+
 let persons = [
     {
         id: 1,
@@ -39,6 +41,28 @@ app.get("/info", (request, response) => {
     const personsInfo = `<p>Phonebook has info for ${persons.length} people</p>`;
     const dateTime = `<p>${new Date().toDateString()} ${new Date().toTimeString()}</p>`;
     response.send(personsInfo + "\n" + dateTime);
+});
+
+app.post("/api/persons", (request, response) => {
+    const body = request.body;
+
+    if (!body.name || !body.number) {
+        return response.status(404).json({
+            error: "body missing",
+        });
+    }
+    const randomIntFromInterval = (min, max) => {
+        // min and max included
+        return Math.floor(Math.random() * (max - min + 1) + min);
+    };
+    const newPerson = {
+        id: randomIntFromInterval(persons.length, 1000),
+        name: body.name,
+        number: body.number,
+    };
+
+    persons = persons.concat(newPerson);
+    response.json(newPerson);
 });
 
 app.delete("/api/persons/:id", (request, response) => {
