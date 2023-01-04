@@ -1,6 +1,6 @@
 import React from "react";
 
-const Persons = ({ persons, filter }) => {
+const Persons = ({ persons, filter, handleDelete }) => {
     return (
         <div>
             {persons
@@ -10,9 +10,16 @@ const Persons = ({ persons, filter }) => {
                         .includes(filter.toLocaleLowerCase())
                 )
                 .map((person) => (
-                    <p key={person.id}>
-                        {person.name} {person.number}
-                    </p>
+                    <div key={person.id}>
+                        {person.name} {person.number}{" "}
+                        <button
+                            onClick={() => {
+                                handleDelete(person.id, person.name);
+                            }}>
+                            {" "}
+                            delete{" "}
+                        </button>
+                    </div>
                 ))}
         </div>
     );

@@ -14,10 +14,13 @@ const App = () => {
 
     useEffect(() => {
         console.log("effect");
-        personsService.getAllPersons().then((allPersons) => {
-            setPersons(allPersons);
-            console.log(allPersons);
-        });
+        personsService
+            .getAllPersons()
+            .then((allPersons) => {
+                setPersons(allPersons);
+                console.log(allPersons);
+            })
+            .catch((err) => console.error(err));
     }, []);
     console.log("Rendered ", persons.length, " persons");
 
@@ -46,7 +49,22 @@ const App = () => {
                 setPersons([...persons, newPerson]);
                 setNewName("");
                 setNewNumber("");
-            });
+            })
+            .catch((err) => console.error(err));
+    };
+
+    const handleDelete = (id, name) => {
+        if (!window.confirm(`Delete ${name}?`)) {
+            return;
+        }
+
+        personsService
+            .deletePerson(id)
+            .then((deletedPerson) => {
+                setPersons(persons.filter((person) => person.id !== id));
+                console.log(`Deleted ${deletedPerson}`);
+            })
+            .catch((err) => console.error(err));
     };
 
     const handleNameChange = (e) => setNewName(e.target.value);
@@ -66,7 +84,11 @@ const App = () => {
                 handleSubmit={handleSubmit}
             />
             <h3>Numbers</h3>
-            <Persons filter={filter} persons={persons} />
+            <Persons
+                filter={filter}
+                persons={persons}
+                handleDelete={handleDelete}
+            />
         </div>
     );
 };
