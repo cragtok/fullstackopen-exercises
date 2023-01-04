@@ -28,21 +28,41 @@ const App = () => {
         e.preventDefault();
         for (const person of persons) {
             if (person.name === newName) {
-                alert(`${newName} is already added to phonebook!`);
-                return;
-            }
-            if (person.number === newNumber) {
-                alert(
-                    `${newNumber} is already added to phonebook under person ${person.name}!`
-                );
+                if (
+                    !window.confirm(
+                        `${person.name} is already added to phonebook, replace the old number with a new one?`
+                    )
+                ) {
+                    return;
+                }
+
+                handleUpdate(person, newNumber);
                 return;
             }
         }
 
+        handleCreate(newName, newNumber);
+    };
+
+    const handleUpdate = (person, number) => {
+        personsService
+            .updatePerson(person.id, { ...person, number })
+            .then((updatedPerson) => {
+                setPersons(
+                    persons.map((person) =>
+                        person.id === updatedPerson.id ? updatedPerson : person
+                    )
+                );
+                console.log(updatedPerson);
+            })
+            .catch((err) => console.error(err));
+    };
+
+    const handleCreate = (name, number) => {
         personsService
             .createPerson({
-                name: newName,
-                number: newNumber,
+                name,
+                number,
             })
             .then((newPerson) => {
                 console.log(newPerson);
