@@ -72,7 +72,13 @@ const App = () => {
                     "success"
                 );
             })
-            .catch((err) => console.error(err));
+            .catch((err) => {
+                showNotification(
+                    `Information of ${person.name} was already deleted from the server.`,
+                    "error"
+                );
+                setPersons(persons.filter((p) => p.id !== person.id));
+            });
     };
 
     const handleCreate = (name, number) => {
