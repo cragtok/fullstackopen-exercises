@@ -12,8 +12,8 @@ morgan.token("body", function getId(req) {
 });
 const app = express();
 
-app.use(express.json());
 app.use(express.static("build"));
+app.use(express.json());
 app.use(cors());
 app.use(morgan(":method :url :status :response-time :body"));
 
@@ -55,9 +55,9 @@ app.post("/api/persons", (request, response) => {
 });
 
 app.delete("/api/persons/:id", (request, response) => {
-    const id = Number(request.params.id);
-    persons = persons.filter((p) => p.id !== id);
-    response.status(204).end();
+    Person.findByIdAndRemove(request.params.id)
+        .then((result) => response.status(204).end())
+        .catch((error) => next(error));
 });
 
 const PORT = process.env.PORT;
