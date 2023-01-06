@@ -18,9 +18,11 @@ app.use(cors());
 app.use(morgan(":method :url :status :response-time :body"));
 
 app.get("/info", (request, response) => {
-    const personsInfo = `<p>Phonebook has info for ${persons.length} people</p>`;
-    const dateTime = `<p>${new Date().toDateString()} ${new Date().toTimeString()}</p>`;
-    response.send(personsInfo + "\n" + dateTime);
+    Person.find({}).then((persons) => {
+        const personsInfo = `<p>Phonebook has info for ${persons.length} people</p>`;
+        const dateTime = `<p>${new Date().toDateString()} ${new Date().toTimeString()}</p>`;
+        response.send(personsInfo + "\n" + dateTime);
+    });
 });
 
 app.get("/api/persons", (request, response) => {
