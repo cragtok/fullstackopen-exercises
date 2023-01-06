@@ -44,24 +44,14 @@ app.post("/api/persons", (request, response) => {
         });
     }
 
-    const duplicatePerson = persons.find((p) => p.name === body.name);
-    if (duplicatePerson) {
-        return response.status(400).json({
-            error: `Person with name ${body.name} already exists in phonebook`,
-        });
-    }
-    const randomIntFromInterval = (min, max) => {
-        // min and max included
-        return Math.floor(Math.random() * (max - min + 1) + min);
-    };
-    const newPerson = {
-        id: randomIntFromInterval(persons.length, 1000),
+    const newPerson = new Person({
         name: body.name,
         number: body.number,
-    };
+    });
 
-    persons = persons.concat(newPerson);
-    response.json(newPerson);
+    newPerson.save().then((savedPerson) => {
+        response.json(savedPerson);
+    });
 });
 
 app.delete("/api/persons/:id", (request, response) => {
