@@ -93,7 +93,10 @@ const App = () => {
                 setNewNumber("");
                 showNotification(`Added ${newPerson.name}`, "success");
             })
-            .catch((err) => console.error(err));
+            .catch((err) => {
+                console.error(err.response.data.error);
+                showNotification(err.response.data.error, "error");
+            });
     };
 
     const handleDelete = (id, name) => {
