@@ -6,4 +6,10 @@ const dummy = (blogs) => {
 const totalLikes = (blogs) => {
     return blogs.reduce((acc, curr) => acc + curr.likes, 0);
 };
-module.exports = { dummy, totalLikes };
+
+const favoriteBlog = (blogs) => {
+    const maxLikes = Math.max(...blogs.map((blog) => blog.likes));
+    const blog = blogs.find((blog) => blog.likes === maxLikes);
+    return { title: blog.title, author: blog.author, likes: blog.likes };
+};
+module.exports = { favoriteBlog, dummy, totalLikes };
