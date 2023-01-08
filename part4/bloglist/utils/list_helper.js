@@ -12,4 +12,28 @@ const favoriteBlog = (blogs) => {
     const blog = blogs.find((blog) => blog.likes === maxLikes);
     return { title: blog.title, author: blog.author, likes: blog.likes };
 };
-module.exports = { favoriteBlog, dummy, totalLikes };
+
+const mostBlogs = (blogs) => {
+    const authorBlogs = {};
+    let maxAuthor = {};
+    blogs.forEach((blog) => {
+        if (!authorBlogs[blog.author]) {
+            authorBlogs[blog.author] = 1;
+            if (!maxAuthor.author) {
+                maxAuthor = { author: blog.author, blogs: 1 };
+            }
+        } else {
+            authorBlogs[blog.author] += 1;
+            if (authorBlogs[blog.author] > maxAuthor.blogs) {
+                maxAuthor = {
+                    author: blog.author,
+                    blogs: authorBlogs[blog.author],
+                };
+            }
+        }
+    });
+
+    return maxAuthor;
+};
+
+module.exports = { mostBlogs, favoriteBlog, dummy, totalLikes };
