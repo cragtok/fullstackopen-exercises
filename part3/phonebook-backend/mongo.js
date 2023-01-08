@@ -20,7 +20,7 @@ const Person = mongoose.model("Person", personSchema);
 
 mongoose
     .connect(url)
-    .then((result) => {
+    .then(() => {
         console.log("Connected");
 
         const person = new Person({
