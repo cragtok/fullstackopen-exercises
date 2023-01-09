@@ -107,6 +107,28 @@ describe("deleting a blog via a DELETE request to the /api/blogs/:id endpoint", 
     });
 });
 
+describe("updating a blog's likes via a PUT request to the /api/blogs/:id endpoint", () => {
+    test("succeeds with status code 200 ", async () => {
+        const initialBlogs = await helper.blogsInDb();
+        const blogToUpdate = initialBlogs[3];
+        blogToUpdate.likes += 1;
+        const response = await api
+            .put(`/api/blogs/${blogToUpdate.id}`)
+            .send(blogToUpdate)
+            .expect(200)
+            .expect("Content-Type", /application\/json/);
+
+        expect(response.body.likes).toBe(blogToUpdate.likes);
+
+        const blogsAtEnd = await helper.blogsInDb();
+        const updatedBlog = blogsAtEnd.find(
+            (blog) => blog.id === blogToUpdate.id
+        );
+
+        expect(updatedBlog.likes).toBe(blogToUpdate.likes);
+    });
+});
+
 afterAll(() => {
     mongoose.connection.close();
 });
