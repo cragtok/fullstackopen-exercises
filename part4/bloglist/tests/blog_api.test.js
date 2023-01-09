@@ -8,6 +8,7 @@ const api = supertest(app);
 const Blog = require("../models/blogs");
 
 jest.setTimeout(20000);
+
 beforeEach(async () => {
     console.log("Deleting blogs");
     await Blog.deleteMany({});
@@ -52,6 +53,21 @@ test("HTTP POST request to the /api/blogs URL successfully creates a new blog po
     const titles = blogs.map((b) => b.title);
     expect(blogs).toHaveLength(helper.initialBlogs.length + 1);
     expect(titles).toContain("Type wars 2");
+});
+
+test("blog without 'likes' property defaults to value 0", async () => {
+    const newBlog = {
+        title: "This Blog Has No Likes",
+        author: "newAuthor",
+        url: "http://www.blogs.com/this_blog_has_no_likes.html",
+    };
+    const response = await api
+        .post("/api/blogs")
+        .send(newBlog)
+        .expect(201)
+        .expect("Content-Type", /application\/json/);
+
+    expect(response.body.likes).toBe(0);
 });
 
 afterAll(() => {
