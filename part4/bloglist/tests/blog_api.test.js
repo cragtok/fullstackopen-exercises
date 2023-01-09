@@ -70,6 +70,22 @@ test("blog without 'likes' property defaults to value 0", async () => {
     expect(response.body.likes).toBe(0);
 });
 
+test("'blog created without 'title' or 'url' properties results in an HTTP 400 response ", async () => {
+    const badBlogs = [helper.initialBlogs[0], helper.initialBlogs[1], {}];
+
+    delete badBlogs[0].url;
+    delete badBlogs[1].title;
+
+    const promiseArray = badBlogs.map((blog) =>
+        api
+            .post("/api/blogs")
+            .send(blog)
+            .expect(400)
+            .expect("Content-Type", /application\/json/)
+    );
+    await Promise.all(promiseArray);
+});
+
 afterAll(() => {
     mongoose.connection.close();
 });
