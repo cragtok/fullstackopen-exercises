@@ -35,6 +35,25 @@ test("unique property of the blog posts is named id", async () => {
     });
 });
 
+test("HTTP POST request to the /api/blogs URL successfully creates a new blog post", async () => {
+    const newBlog = {
+        title: "Type wars 2",
+        author: "Robert C. Martin2",
+        url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
+        likes: 22,
+    };
+    await api
+        .post("/api/blogs")
+        .send(newBlog)
+        .expect(201)
+        .expect("Content-Type", /application\/json/);
+
+    const blogs = await helper.blogsInDb();
+    const titles = blogs.map((b) => b.title);
+    expect(blogs).toHaveLength(helper.initialBlogs.length + 1);
+    expect(titles).toContain("Type wars 2");
+});
+
 afterAll(() => {
     mongoose.connection.close();
 });
