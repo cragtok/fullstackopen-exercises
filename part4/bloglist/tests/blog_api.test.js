@@ -28,6 +28,13 @@ test("all blogs are returned", async () => {
     expect(response.body).toHaveLength(helper.initialBlogs.length);
 });
 
+test("unique property of the blog posts is named id", async () => {
+    const blogs = await helper.blogsInDb();
+    blogs.forEach((blog) => {
+        expect(blog.id).toBeDefined();
+    });
+});
+
 afterAll(() => {
     mongoose.connection.close();
 });
