@@ -5,7 +5,7 @@ const app = require("../app");
 
 const api = supertest(app);
 
-const Blog = require("../models/blogs");
+const Blog = require("../models/blog");
 
 jest.setTimeout(20000);
 
