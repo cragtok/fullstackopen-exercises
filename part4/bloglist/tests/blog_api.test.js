@@ -1,22 +1,50 @@
 const mongoose = require("mongoose");
 const supertest = require("supertest");
-const helper = require("./test_helper");
-const app = require("../app");
 
+const app = require("../app");
 const api = supertest(app);
 
+const helper = require("./test_helper");
 const Blog = require("../models/blog");
+const User = require("../models/user");
 
 jest.setTimeout(20000);
 
 beforeEach(async () => {
+    console.log("Deleting Users");
+    await User.deleteMany({});
+    console.log("Users deleted");
+    const userIds = [];
+    const userPromises = helper.initialUsers.map((user) =>
+        api
+            .post("/api/users")
+            .send(user)
+            .then((response) => {
+                userIds.push(response.body.id);
+            })
+    );
+    console.log("Adding users");
+    await Promise.all(userPromises);
+    console.log("Users added");
+
+    const randomIntFromInterval = (min, max) => {
+        // min and max included
+        return Math.floor(Math.random() * (max - min + 1) + min);
+    };
+
     console.log("Deleting blogs");
     await Blog.deleteMany({});
     console.log("Blogs deleted");
-    const blogObjects = helper.initialBlogs.map((blog) => new Blog(blog));
-    const promiseArray = blogObjects.map((blog) => blog.save());
+    const blogObjects = helper.initialBlogs.map(
+        (blog) =>
+            new Blog({
+                ...blog,
+                user: userIds[randomIntFromInterval(0, userIds.length - 1)],
+            })
+    );
+    const blogPromises = blogObjects.map((blog) => blog.save());
     console.log("Adding blogs");
-    await Promise.all(promiseArray);
+    await Promise.all(blogPromises);
     console.log("Blogs added");
 });
 
@@ -38,17 +66,31 @@ describe("when there are some blogs saved in the database", () => {
     });
 });
 
+const getToken = async (blogUser) => {
+    const tokenResponse = await api
+        .post("/api/login")
+        .send({ username: blogUser.username, password: blogUser.password })
+        .expect(200)
+        .expect("Content-Type", /application\/json/);
+    return tokenResponse.body.token;
+};
+
 describe("addition of a new blog via a POST request to the /api/blogs endpoint", () => {
     test("successfully creates a new blog post with a HTTP 201 response", async () => {
+        const blogUser = helper.initialUsers[0];
+        const token = await getToken(blogUser);
+
         const newBlog = {
             title: "Type wars 2",
-            author: "Robert C. Martin2",
+            author: blogUser.name,
             url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
             likes: 22,
         };
+
         await api
             .post("/api/blogs")
             .send(newBlog)
+            .set({ Authorization: `bearer ${token}` })
             .expect(201)
             .expect("Content-Type", /application\/json/);
 
@@ -59,14 +101,19 @@ describe("addition of a new blog via a POST request to the /api/blogs endpoint",
     });
 
     test("without a 'likes' property defaults it to 0", async () => {
+        const blogUser = helper.initialUsers[1];
+        const token = await getToken(blogUser);
+
         const newBlog = {
             title: "This Blog Has No Likes",
-            author: "newAuthor",
+            author: blogUser.username,
             url: "http://www.blogs.com/this_blog_has_no_likes.html",
         };
+
         const response = await api
             .post("/api/blogs")
             .send(newBlog)
+            .set({ Authorization: `bearer ${token}` })
             .expect(201)
             .expect("Content-Type", /application\/json/);
 
@@ -74,8 +121,10 @@ describe("addition of a new blog via a POST request to the /api/blogs endpoint",
     });
 
     test("without a 'title' or 'url' properties results in an HTTP 400 response ", async () => {
-        const badBlogs = [helper.initialBlogs[0], helper.initialBlogs[1], {}];
+        const blogUser = helper.initialUsers[2];
+        const token = await getToken(blogUser);
 
+        const badBlogs = [helper.initialBlogs[0], helper.initialBlogs[1], {}];
         delete badBlogs[0].url;
         delete badBlogs[1].title;
 
@@ -83,6 +132,7 @@ describe("addition of a new blog via a POST request to the /api/blogs endpoint",
             api
                 .post("/api/blogs")
                 .send(blog)
+                .set({ Authorization: `bearer ${token}` })
                 .expect(400)
                 .expect("Content-Type", /application\/json/)
         );
@@ -94,7 +144,19 @@ describe("deleting a blog via a DELETE request to the /api/blogs/:id endpoint", 
     test("succeeds with status code 204 when the id is valid", async () => {
         const blogsAtStart = await helper.blogsInDb();
         const blogToDelete = blogsAtStart[0];
-        await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+
+        const foundUser = await User.findById(blogToDelete.user);
+
+        const blogUser = helper.initialUsers.find(
+            (user) => user.username === foundUser.username
+        );
+
+        const token = await getToken(blogUser);
+
+        await api
+            .delete(`/api/blogs/${blogToDelete.id}`)
+            .set({ Authorization: `bearer ${token}` })
+            .expect(204);
 
         const blogsAtEnd = await helper.blogsInDb();
         expect(blogsAtEnd).toHaveLength(blogsAtStart.length - 1);
@@ -103,7 +165,27 @@ describe("deleting a blog via a DELETE request to the /api/blogs/:id endpoint", 
     });
 
     test("fails with status code 400 when the id is invalid", async () => {
-        await api.delete("/api/blogs/w1334rwovwj3cw3sfwffefsfsf").expect(400);
+        const blogsAtStart = await helper.blogsInDb();
+        const blogToDelete = blogsAtStart[0];
+
+        const foundUser = await User.findById(blogToDelete.user);
+
+        const blogUser = helper.initialUsers.find(
+            (user) => user.username === foundUser.username
+        );
+
+        const token = await getToken(blogUser);
+
+        await api
+            .delete("/api/blogs/w1334rwovwj3cw3sfwffefsfsf")
+            .set({ Authorization: `bearer ${token}` })
+            .expect(400);
+    });
+
+    test("fails with status code 401 when a token is not provided", async () => {
+        const blogsAtStart = await helper.blogsInDb();
+        const blogToDelete = blogsAtStart[0];
+        await api.delete(`/api/blogs/${blogToDelete._id}`).expect(401);
     });
 });
 
