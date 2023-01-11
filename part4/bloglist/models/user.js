@@ -16,6 +16,12 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, "Name is required."],
     },
+    blogs: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Blog",
+        },
+    ],
 });
 
 userSchema.plugin(uniqueValidator);
