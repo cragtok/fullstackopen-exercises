@@ -63,3 +63,33 @@ test("should render blog's url and likes when the 'view' button is clicked", asy
     expect(url).toBeDefined();
     expect(url).toHaveTextContent("www.blog.com");
 });
+
+test("should call event handler for liking a post twice when clicked", async () => {
+    const blog = {
+        title: "TEST",
+        author: "author",
+        url: "www.blog.com",
+        likes: 12,
+        user: { username: "username" },
+    };
+
+    const mockHandler = jest.fn();
+    render(
+        <Blog
+            likeBlog={mockHandler}
+            removeBlog={() => {}}
+            blog={blog}
+            showDeleteButton={true}
+        />
+    );
+
+    const user = userEvent.setup();
+
+    const viewButton = screen.getByText("view");
+    await user.click(viewButton);
+    const likeButton = screen.getByText("likes");
+    await user.click(likeButton);
+    await user.click(likeButton);
+
+    expect(mockHandler.mock.calls).toHaveLength(2);
+});
