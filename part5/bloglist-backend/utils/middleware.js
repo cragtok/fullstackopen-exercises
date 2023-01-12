@@ -33,12 +33,16 @@ const userExtractor = async (request, response, next) => {
     const authorization = request.get("authorization");
     if (authorization && authorization.toLowerCase().startsWith("bearer ")) {
         const token = authorization.substring(7);
-        const decodedToken = jwt.verify(token, process.env.SECRET);
-        if (decodedToken.id) {
-            const user = await User.findById(decodedToken.id);
-            if (user) {
-                request.user = user;
+        try {
+            const decodedToken = jwt.verify(token, process.env.SECRET);
+            if (decodedToken.id) {
+                const user = await User.findById(decodedToken.id);
+                if (user) {
+                    request.user = user;
+                }
             }
+        } catch (error) {
+            next(error);
         }
     }
     next();

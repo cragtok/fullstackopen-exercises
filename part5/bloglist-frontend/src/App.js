@@ -1,13 +1,25 @@
 import { useState, useEffect } from "react";
-import Blog from "./components/Blog";
+
+import LoginForm from "./components/LoginForm";
+import BlogList from "./components/BlogList";
+import Logout from "./components/Logout";
+import BlogForm from "./components/BlogForm";
+
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 
 const App = () => {
     const [blogs, setBlogs] = useState([]);
+
+    // LoginForm
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [user, setUser] = useState(null);
+
+    // BlogForm
+    const [title, setTitle] = useState("");
+    const [author, setAuthor] = useState("");
+    const [url, setUrl] = useState("");
 
     useEffect(() => {
         blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -18,9 +30,24 @@ const App = () => {
         if (loggedUserJSON) {
             const user = JSON.parse(loggedUserJSON);
             setUser(user);
-            blogService.setToken(user);
+            blogService.setToken(user.token);
         }
     }, []);
+
+    const createBlog = async (e) => {
+        e.preventDefault();
+        const newBlog = {
+            title,
+            author,
+            url,
+        };
+        try {
+            const createdBlog = await blogService.create(newBlog);
+            setBlogs(blogs.concat(createdBlog));
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -30,7 +57,6 @@ const App = () => {
             setUser(response);
             setUsername("");
             setPassword("");
-            console.log(response);
             window.localStorage.setItem(
                 "loggedInUser",
                 JSON.stringify(response)
@@ -44,48 +70,39 @@ const App = () => {
         setUser(null);
         window.localStorage.removeItem("loggedInUser");
     };
-    if (!user) {
-        return (
-            <div>
-                <h2>Log in to application</h2>
-                <form onSubmit={handleLogin}>
-                    <div>
-                        Username:{" "}
-                        <input
-                            type="text"
-                            name="Username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                        />
-                    </div>
-                    <div>
-                        Password:{" "}
-                        <input
-                            type="password"
-                            name="Password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                    </div>
-                    <button>Login</button>
-                </form>
-            </div>
-        );
-    }
 
     return (
         <div>
-            <h2>blogs</h2>
-            <div>
-                {`${user.name} logged in`}{" "}
-                <button onClick={handleLogout}>Logout</button>
-            </div>
-            <br />
-            <div>
-                {blogs.map((blog) => (
-                    <Blog key={blog.id} blog={blog} />
-                ))}
-            </div>
+            {!user ? (
+                <>
+                    <h2>Log in to application</h2>
+                    <LoginForm
+                        username={username}
+                        password={password}
+                        setUsername={setUsername}
+                        setPassword={setPassword}
+                        handleLogin={handleLogin}
+                    />
+                </>
+            ) : (
+                <>
+                    <h2>blogs</h2>
+                    <Logout name={user.name} handleLogout={handleLogout} />
+                    <br />
+                    <h2>create new</h2>
+                    <BlogForm
+                        title={title}
+                        author={author}
+                        url={url}
+                        setTitle={setTitle}
+                        setAuthor={setAuthor}
+                        setUrl={setUrl}
+                        createBlog={createBlog}
+                    />
+                    <br />
+                    <BlogList blogs={blogs} />
+                </>
+            )}
         </div>
     );
 };
