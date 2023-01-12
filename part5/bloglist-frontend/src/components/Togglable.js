@@ -1,5 +1,6 @@
 import React, { useState, forwardRef, useImperativeHandle } from "react";
 
+// eslint-disable-next-line react/display-name
 const Togglable = forwardRef((props, refs) => {
     const [visible, setVisible] = useState(false);
 

@@ -21,7 +21,7 @@ module.exports = {
         semi: ["error", "always"],
         eqeqeq: ["error", "always"],
         "no-trailing-spaces": "error",
-        "object-curly-spacing": ["warng", "always"],
+        "object-curly-spacing": ["warn", "always"],
         "arrow-spacing": ["error", { before: true, after: true }],
         "no-console": 0,
         "react/prop-types": 0,

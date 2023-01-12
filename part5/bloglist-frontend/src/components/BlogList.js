@@ -1,7 +1,7 @@
 import Blog from "./Blog";
 import PropTypes from "prop-types";
 
-const BlogList = ({ blogs, likeBlog, removeBlog }) => {
+const BlogList = ({ blogs, likeBlog, removeBlog, loggedInUser }) => {
     return (
         <div>
             {blogs.map((blog) => (
@@ -10,6 +10,7 @@ const BlogList = ({ blogs, likeBlog, removeBlog }) => {
                     blog={blog}
                     removeBlog={removeBlog}
                     likeBlog={likeBlog}
+                    showDeleteButton={blog.user.username === loggedInUser}
                 />
             ))}
         </div>

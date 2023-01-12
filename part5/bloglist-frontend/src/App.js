@@ -163,6 +163,7 @@ const App = () => {
                         removeBlog={removeBlog}
                         likeBlog={likeBlog}
                         blogs={blogs}
+                        loggedInUser={user.username}
                     />
                 </>
             )}
