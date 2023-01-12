@@ -1,17 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 
-const BlogForm = ({
-    title,
-    author,
-    url,
-    setTitle,
-    setAuthor,
-    setUrl,
-    createBlog,
-}) => {
+const BlogForm = ({ createBlog }) => {
+    const [title, setTitle] = useState("");
+    const [author, setAuthor] = useState("");
+    const [url, setUrl] = useState("");
+
+    const addBlog = async (e) => {
+        e.preventDefault();
+        await createBlog({ title, author, url });
+        setTitle("");
+        setAuthor("");
+        setUrl("");
+    };
     return (
         <div>
-            <form onSubmit={createBlog}>
+            <form onSubmit={addBlog}>
                 <div>
                     Title:{" "}
                     <input

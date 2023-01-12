@@ -20,11 +20,6 @@ const App = () => {
     const [password, setPassword] = useState("");
     const [user, setUser] = useState(null);
 
-    // BlogForm
-    const [title, setTitle] = useState("");
-    const [author, setAuthor] = useState("");
-    const [url, setUrl] = useState("");
-
     // Notification
     const [notificationMessage, setNotificationMessage] = useState("");
     const [notificationType, setNotificationType] = useState("");
@@ -44,16 +39,10 @@ const App = () => {
         }
     }, []);
 
-    const createBlog = async (e) => {
-        e.preventDefault();
-        const newBlog = {
-            title,
-            author,
-            url,
-        };
+    const createBlog = async (newBlog) => {
         try {
-            blogFormRef.current.toggleVisibility();
             const createdBlog = await blogService.create(newBlog);
+            blogFormRef.current.toggleVisibility();
             setBlogs(blogs.concat(createdBlog));
             displayNotification(
                 `a new blog post ${createdBlog.title} by ${createdBlog.author} added`,
@@ -123,15 +112,7 @@ const App = () => {
                     <br />
                     <h2>create new</h2>
                     <Togglable ref={blogFormRef} buttonLabel="Create New Post">
-                        <BlogForm
-                            title={title}
-                            author={author}
-                            url={url}
-                            setTitle={setTitle}
-                            setAuthor={setAuthor}
-                            setUrl={setUrl}
-                            createBlog={createBlog}
-                        />
+                        <BlogForm createBlog={createBlog} />
                     </Togglable>
                     <br />
                     <BlogList blogs={blogs} />
