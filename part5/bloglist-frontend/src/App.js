@@ -54,6 +54,28 @@ const App = () => {
         }
     };
 
+    const likeBlog = async (oldBlog) => {
+        try {
+            const updatedBlog = await blogService.update({
+                ...oldBlog,
+                likes: oldBlog.likes + 1,
+                user: oldBlog.user.id,
+            });
+            setBlogs(
+                blogs.map((blog) =>
+                    blog.id === updatedBlog.id ? updatedBlog : blog
+                )
+            );
+            displayNotification(
+                `Blog post ${updatedBlog.title} liked`,
+                "success"
+            );
+        } catch (error) {
+            console.error(error);
+            displayNotification(error.response.data.error, "error");
+        }
+    };
+
     const handleLogin = async (e) => {
         e.preventDefault();
 
@@ -115,7 +137,7 @@ const App = () => {
                         <BlogForm createBlog={createBlog} />
                     </Togglable>
                     <br />
-                    <BlogList blogs={blogs} />
+                    <BlogList likeBlog={likeBlog} blogs={blogs} />
                 </>
             )}
         </div>
