@@ -27,7 +27,9 @@ const App = () => {
     const blogFormRef = useRef();
 
     useEffect(() => {
-        blogService.getAll().then((blogs) => setBlogs(blogs));
+        blogService
+            .getAll()
+            .then((blogs) => setBlogs(blogs.sort((a, b) => a.likes < b.likes)));
     }, []);
 
     useEffect(() => {
@@ -62,9 +64,11 @@ const App = () => {
                 user: oldBlog.user.id,
             });
             setBlogs(
-                blogs.map((blog) =>
-                    blog.id === updatedBlog.id ? updatedBlog : blog
-                )
+                blogs
+                    .map((blog) =>
+                        blog.id === updatedBlog.id ? updatedBlog : blog
+                    )
+                    .sort((a, b) => a.likes < b.likes)
             );
             displayNotification(
                 `Blog post ${updatedBlog.title} liked`,
