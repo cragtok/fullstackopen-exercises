@@ -4,9 +4,12 @@ import LoginForm from "./components/LoginForm";
 import BlogList from "./components/BlogList";
 import Logout from "./components/Logout";
 import BlogForm from "./components/BlogForm";
+import Notification from "./components/Notification";
 
 import blogService from "./services/blogs";
 import loginService from "./services/login";
+
+import "./App.css";
 
 const App = () => {
     const [blogs, setBlogs] = useState([]);
@@ -20,6 +23,10 @@ const App = () => {
     const [title, setTitle] = useState("");
     const [author, setAuthor] = useState("");
     const [url, setUrl] = useState("");
+
+    // Notification
+    const [notificationMessage, setNotificationMessage] = useState("");
+    const [notificationType, setNotificationType] = useState("");
 
     useEffect(() => {
         blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -44,8 +51,13 @@ const App = () => {
         try {
             const createdBlog = await blogService.create(newBlog);
             setBlogs(blogs.concat(createdBlog));
+            displayNotification(
+                `a new blog post ${createdBlog.title} by ${createdBlog.author} added`,
+                "success"
+            );
         } catch (error) {
             console.error(error);
+            displayNotification(error.response.data.error, "error");
         }
     };
 
@@ -63,7 +75,17 @@ const App = () => {
             );
         } catch (error) {
             console.error(error);
+            displayNotification(error.response.data.error, "error");
         }
+    };
+
+    const displayNotification = (message, type) => {
+        setNotificationMessage(message);
+        setNotificationType(type);
+        setTimeout(() => {
+            setNotificationMessage("");
+            setNotificationType("");
+        }, 3500);
     };
 
     const handleLogout = () => {
@@ -73,6 +95,12 @@ const App = () => {
 
     return (
         <div>
+            {notificationMessage && notificationType && (
+                <Notification
+                    message={notificationMessage}
+                    type={notificationType}
+                />
+            )}
             {!user ? (
                 <>
                     <h2>Log in to application</h2>
