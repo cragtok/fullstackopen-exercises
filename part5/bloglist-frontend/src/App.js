@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import LoginForm from "./components/LoginForm";
 import BlogList from "./components/BlogList";
 import Logout from "./components/Logout";
 import BlogForm from "./components/BlogForm";
 import Notification from "./components/Notification";
+import Togglable from "./components/Togglable";
 
 import blogService from "./services/blogs";
 import loginService from "./services/login";
@@ -28,6 +29,8 @@ const App = () => {
     const [notificationMessage, setNotificationMessage] = useState("");
     const [notificationType, setNotificationType] = useState("");
 
+    const blogFormRef = useRef();
+
     useEffect(() => {
         blogService.getAll().then((blogs) => setBlogs(blogs));
     }, []);
@@ -49,6 +52,7 @@ const App = () => {
             url,
         };
         try {
+            blogFormRef.current.toggleVisibility();
             const createdBlog = await blogService.create(newBlog);
             setBlogs(blogs.concat(createdBlog));
             displayNotification(
@@ -118,15 +122,17 @@ const App = () => {
                     <Logout name={user.name} handleLogout={handleLogout} />
                     <br />
                     <h2>create new</h2>
-                    <BlogForm
-                        title={title}
-                        author={author}
-                        url={url}
-                        setTitle={setTitle}
-                        setAuthor={setAuthor}
-                        setUrl={setUrl}
-                        createBlog={createBlog}
-                    />
+                    <Togglable ref={blogFormRef} buttonLabel="Create New Post">
+                        <BlogForm
+                            title={title}
+                            author={author}
+                            url={url}
+                            setTitle={setTitle}
+                            setAuthor={setAuthor}
+                            setUrl={setUrl}
+                            createBlog={createBlog}
+                        />
+                    </Togglable>
                     <br />
                     <BlogList blogs={blogs} />
                 </>
