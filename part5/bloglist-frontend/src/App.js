@@ -80,6 +80,24 @@ const App = () => {
         }
     };
 
+    const removeBlog = async (id) => {
+        if (!window.confirm("Are you sure?")) {
+            return;
+        }
+        try {
+            await blogService.remove(id);
+            setBlogs(
+                blogs
+                    .filter((blog) => blog.id !== id)
+                    .sort((a, b) => a.likes < b.likes)
+            );
+            displayNotification("Blog post deleted", "success");
+        } catch (error) {
+            console.error(error);
+            displayNotification(error.response.data.error, "error");
+        }
+    };
+
     const handleLogin = async (e) => {
         e.preventDefault();
 
@@ -141,7 +159,11 @@ const App = () => {
                         <BlogForm createBlog={createBlog} />
                     </Togglable>
                     <br />
-                    <BlogList likeBlog={likeBlog} blogs={blogs} />
+                    <BlogList
+                        removeBlog={removeBlog}
+                        likeBlog={likeBlog}
+                        blogs={blogs}
+                    />
                 </>
             )}
         </div>
