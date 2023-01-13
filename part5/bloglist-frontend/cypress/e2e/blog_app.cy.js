@@ -33,4 +33,22 @@ describe("Blog app", function () {
                 .and("have.css", "color", "rgb(255, 0, 0)");
         });
     });
+
+    describe("When logged in", function () {
+        beforeEach(function () {
+            cy.login({ username: "testuser1", password: "123456" });
+        });
+
+        it("A blog can be created", function () {
+            cy.get("#toggleable-show").click();
+            cy.get("#blog-title").type("NEW BLOG");
+            cy.get("#blog-author").type("testuser");
+            cy.get("#blog-url").type("www.blogs.com");
+            cy.get("#blog-create").click();
+            cy.contains("NEW BLOG testuser ");
+            cy.get(".notification-success")
+                .should("contain", "a new blog post NEW BLOG by testuser added")
+                .and("have.css", "color", "rgb(0, 128, 0)");
+        });
+    });
 });
