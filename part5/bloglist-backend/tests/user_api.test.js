@@ -7,7 +7,7 @@ const api = supertest(app);
 
 jest.setTimeout(20000);
 
-beforeAll(async () => {
+beforeEach(async () => {
     console.log("Deleting users");
     await User.deleteMany({});
     console.log("Users deleted");

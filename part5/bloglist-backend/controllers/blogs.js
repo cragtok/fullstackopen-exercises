@@ -64,7 +64,9 @@ blogsRouter.delete("/:id", async (request, response, next) => {
         if (blog.user.toString() !== user._id.toString()) {
             return response.status(401).json({ error: "Authorization denied" });
         }
-        user.blogs.filter((blog) => blog.toString() !== blog._id.toString());
+        user.blogs = user.blogs.filter(
+            (blog) => blog.id.toString() !== blog._id.toString()
+        );
         await user.save();
         await blog.delete();
         response.status(204).end();
@@ -98,6 +100,7 @@ blogsRouter.put("/:id", async (request, response, next) => {
                 context: "query",
             }
         );
+        await updatedBlog.populate("user", { username: 1, name: 1 });
         response.json(updatedBlog);
     } catch (error) {
         next(error);

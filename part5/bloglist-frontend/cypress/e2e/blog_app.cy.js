@@ -94,5 +94,63 @@ describe("Blog app", function () {
             cy.contains("view").click();
             cy.get("html").should("not.contain", "Delete");
         });
+
+        it("Blogs are sorted in descending order of the number of likes", function () {
+            function submitBlogForm(title, author, url) {
+                cy.get("#toggleable-show").click();
+                cy.get("#blog-title").type(title);
+                cy.get("#blog-author").type(author);
+                cy.get("#blog-url").type(url);
+                cy.get("#blog-create").click();
+            }
+
+            submitBlogForm("1st blog", "testuser1", "www.blog.com");
+            cy.contains("1st blog testuser1 ")
+                .parent()
+                .contains("view")
+                .click();
+
+            cy.get(".blog-likes").contains("like").click();
+            cy.get(".notification-success").and(
+                "have.css",
+                "color",
+                "rgb(0, 128, 0)"
+            );
+            cy.contains("Likes 1 ");
+
+            cy.get(".blog-likes").contains("like").click();
+            cy.get(".notification-success").and(
+                "have.css",
+                "color",
+                "rgb(0, 128, 0)"
+            );
+            cy.contains("Likes 2 ");
+            cy.contains("hide").click();
+
+            submitBlogForm("2nd blog", "testuser1", "www.blog.com");
+            cy.contains("2nd blog testuser1 ")
+                .parent()
+                .contains("view")
+                .click();
+
+            cy.get(".blog-likes").contains("like").click();
+            cy.get(".notification-success").and(
+                "have.css",
+                "color",
+                "rgb(0, 128, 0)"
+            );
+            cy.contains("Likes 1 ");
+            cy.contains("hide").click();
+
+            cy.get(".blog-titleAuthor")
+                .eq(0)
+                .should("contain", "1st blog testuser1");
+            cy.get(".blog-titleAuthor")
+                .eq(1)
+                .should("contain", "2nd blog testuser1");
+            cy.get(".blog-titleAuthor")
+                .eq(2)
+                .should("contain", "hello world testuser1");
+        });
     });
 });

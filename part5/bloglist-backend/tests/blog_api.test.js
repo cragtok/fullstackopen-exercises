@@ -10,6 +10,8 @@ const User = require("../models/user");
 
 jest.setTimeout(20000);
 
+// Note - run each describe() block separately
+
 beforeEach(async () => {
     console.log("Deleting Users");
     await User.deleteMany({});
@@ -194,8 +196,15 @@ describe("updating a blog's likes via a PUT request to the /api/blogs/:id endpoi
         const initialBlogs = await helper.blogsInDb();
         const blogToUpdate = initialBlogs[3];
         blogToUpdate.likes += 1;
+
+        const foundUser = await User.findById(blogToUpdate.user);
+        const blogUser = helper.initialUsers.find(
+            (user) => user.username === foundUser.username
+        );
+        const token = await getToken(blogUser);
         const response = await api
             .put(`/api/blogs/${blogToUpdate.id}`)
+            .set({ Authorization: `bearer ${token}` })
             .send(blogToUpdate)
             .expect(200)
             .expect("Content-Type", /application\/json/);

@@ -29,7 +29,7 @@ const App = () => {
     useEffect(() => {
         blogService
             .getAll()
-            .then((blogs) => setBlogs(blogs.sort((a, b) => a.likes < b.likes)));
+            .then((blogs) => setBlogs(blogs.sort((a, b) => b.likes - a.likes)));
     }, []);
 
     useEffect(() => {
@@ -42,6 +42,7 @@ const App = () => {
     }, []);
 
     const createBlog = async (newBlog) => {
+        let success = false;
         try {
             const createdBlog = await blogService.create(newBlog);
             blogFormRef.current.toggleVisibility();
@@ -50,10 +51,12 @@ const App = () => {
                 `a new blog post ${createdBlog.title} by ${createdBlog.author} added`,
                 "success"
             );
+            success = true;
         } catch (error) {
             console.error(error);
             displayNotification(error.response.data.error, "error");
         }
+        return success;
     };
 
     const likeBlog = async (oldBlog) => {
@@ -68,7 +71,7 @@ const App = () => {
                     .map((blog) =>
                         blog.id === updatedBlog.id ? updatedBlog : blog
                     )
-                    .sort((a, b) => a.likes < b.likes)
+                    .sort((a, b) => b.likes - a.likes)
             );
             displayNotification(
                 `Blog post ${updatedBlog.title} liked`,
@@ -89,7 +92,7 @@ const App = () => {
             setBlogs(
                 blogs
                     .filter((blog) => blog.id !== id)
-                    .sort((a, b) => a.likes < b.likes)
+                    .sort((a, b) => b.likes - a.likes)
             );
             displayNotification("Blog post deleted", "success");
         } catch (error) {
@@ -100,16 +103,17 @@ const App = () => {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-
         try {
             const response = await loginService.login({ username, password });
             setUser(response);
             setUsername("");
             setPassword("");
+            window.localStorage.clear();
             window.localStorage.setItem(
                 "loggedInUser",
                 JSON.stringify(response)
             );
+            blogService.setToken(response.token);
         } catch (error) {
             console.error(error);
             displayNotification(error.response.data.error, "error");
@@ -128,6 +132,7 @@ const App = () => {
     const handleLogout = () => {
         setUser(null);
         window.localStorage.removeItem("loggedInUser");
+        blogService.setToken(null);
     };
 
     return (

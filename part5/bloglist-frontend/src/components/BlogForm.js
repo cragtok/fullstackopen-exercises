@@ -7,10 +7,12 @@ const BlogForm = ({ createBlog }) => {
 
     const addBlog = async (e) => {
         e.preventDefault();
-        await createBlog({ title, author, url });
-        setTitle("");
-        setAuthor("");
-        setUrl("");
+        const success = await createBlog({ title, author, url });
+        if (success) {
+            setTitle("");
+            setAuthor("");
+            setUrl("");
+        }
     };
     return (
         <div>
