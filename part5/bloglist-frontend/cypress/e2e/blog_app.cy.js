@@ -6,6 +6,7 @@ describe("Blog app", function () {
             name: "testuser",
             password: "123456",
         });
+
         cy.visit("http://localhost:3000");
     });
 
@@ -36,6 +37,12 @@ describe("Blog app", function () {
 
     describe("When logged in", function () {
         beforeEach(function () {
+            cy.createUser({
+                username: "testuser2",
+                name: "testuser2",
+                password: "123456",
+            });
+
             cy.login({ username: "testuser1", password: "123456" });
             cy.createBlog({
                 title: "hello world",
@@ -61,6 +68,31 @@ describe("Blog app", function () {
             cy.contains("view").click();
             cy.contains("like").click();
             cy.contains("Likes 1 ");
+            cy.get(".notification-success")
+                .should("have.css", "color", "rgb(0, 128, 0)")
+                .and("contain", "Blog post hello world liked");
+        });
+
+        it("A user can delete one of his own blogs", function () {
+            cy.contains("view").click();
+            cy.contains("Delete").click();
+            cy.get(".notification-success")
+                .should("contain", "Blog post deleted")
+                .and("have.css", "color", "rgb(0, 128, 0)");
+            cy.get("html").should("not.contain", "hello world testuser1 ");
+        });
+
+        it("A user cannot delete a blog belonging to another user", function () {
+            window.localStorage.clear();
+            cy.visit("http://localhost:3000");
+            cy.get("#login-username").type("testuser2");
+            cy.get("#login-password").type("123456");
+            cy.get("#login-button").click();
+            cy.contains("testuser2 logged in");
+
+            cy.contains("hello world testuser1 ");
+            cy.contains("view").click();
+            cy.get("html").should("not.contain", "Delete");
         });
     });
 });
