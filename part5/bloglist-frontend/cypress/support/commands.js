@@ -41,3 +41,20 @@ Cypress.Commands.add("createUser", ({ username, name, password }) => {
         name,
     });
 });
+
+Cypress.Commands.add("createBlog", ({ title, author, url }) => {
+    cy.request({
+        method: "POST",
+        url: "http://localhost:3003/api/blogs",
+        headers: {
+            Authorization: `bearer ${
+                JSON.parse(window.localStorage.getItem("loggedInUser")).token
+            }`,
+        },
+        body: {
+            title,
+            author,
+            url,
+        },
+    });
+});

@@ -37,6 +37,12 @@ describe("Blog app", function () {
     describe("When logged in", function () {
         beforeEach(function () {
             cy.login({ username: "testuser1", password: "123456" });
+            cy.createBlog({
+                title: "hello world",
+                author: "testuser1",
+                url: "www.blog.com",
+            });
+            cy.visit("http://localhost:3000");
         });
 
         it("A blog can be created", function () {
@@ -49,6 +55,12 @@ describe("Blog app", function () {
             cy.get(".notification-success")
                 .should("contain", "a new blog post NEW BLOG by testuser added")
                 .and("have.css", "color", "rgb(0, 128, 0)");
+        });
+
+        it("A blog can be liked", function () {
+            cy.contains("view").click();
+            cy.contains("like").click();
+            cy.contains("Likes 1 ");
         });
     });
 });
