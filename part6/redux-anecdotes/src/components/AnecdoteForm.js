@@ -5,7 +5,6 @@ import {
     showNotification,
     removeNotification,
 } from "../reducers/notificationReducer";
-import noteService from "../services/anecdotes";
 
 const AnecdoteForm = () => {
     const dispatch = useDispatch();
@@ -15,8 +14,7 @@ const AnecdoteForm = () => {
         const content = e.target.anecdote.value;
         console.log("content", content);
         e.target.anecdote.value = "";
-        const newAnecdote = await noteService.createNew(content);
-        dispatch(createAnecdote(newAnecdote));
+        dispatch(createAnecdote(content));
         dispatch(showNotification("Created anecdote!"));
         setTimeout(() => {
             dispatch(removeNotification());
