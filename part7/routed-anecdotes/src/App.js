@@ -95,37 +95,38 @@ const CreateNew = (props) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         props.addNew({
-            content: content.value,
-            author: author.value,
-            info: info.value,
+            content: content.inputProps.value,
+            author: author.inputProps.value,
+            info: info.inputProps.value,
             votes: 0,
         });
     };
 
     const resetFields = (e) => {
         e.preventDefault();
-        content.setValue("");
-        author.setValue("");
-        info.setValue("");
+        content.resetField("");
+        content.resetField();
+        author.resetField();
+        info.resetField();
     };
     return (
         <div>
             <h2>create a new anecdote</h2>
-            <form>
+            <form onSubmit={handleSubmit}>
                 <div>
                     content
-                    <input {...content} />
+                    <input {...content.inputProps} />
                 </div>
                 <div>
                     author
-                    <input {...author} />
+                    <input {...author.inputProps} />
                 </div>
                 <div>
                     url for more info
-                    <input {...info} />
+                    <input {...info.inputProps} />
                 </div>
-                <button onClick={handleSubmit}>create</button>
                 <button onClick={resetFields}>reset</button>
+                <button>create</button>
             </form>
         </div>
     );

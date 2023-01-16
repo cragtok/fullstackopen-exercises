@@ -5,5 +5,9 @@ export const useField = (type, name) => {
     const onChange = (e) => {
         setValue(e.target.value);
     };
-    return { type, name, value, setValue, onChange };
+
+    const resetField = () => {
+        setValue("");
+    };
+    return { inputProps: { type, name, value, onChange }, resetField };
 };
