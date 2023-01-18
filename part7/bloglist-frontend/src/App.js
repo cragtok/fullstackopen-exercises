@@ -10,7 +10,10 @@ import Togglable from "./components/Togglable";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 
+import { displayNotification } from "./reducers/notificationReducer";
+
 import "./App.css";
+import { useDispatch, useSelector } from "react-redux";
 
 const App = () => {
     const [blogs, setBlogs] = useState([]);
@@ -20,11 +23,11 @@ const App = () => {
     const [password, setPassword] = useState("");
     const [user, setUser] = useState(null);
 
-    // Notification
-    const [notificationMessage, setNotificationMessage] = useState("");
-    const [notificationType, setNotificationType] = useState("");
-
     const blogFormRef = useRef();
+
+    const dispatch = useDispatch();
+
+    const notification = useSelector(state => state.notification);
 
     useEffect(() => {
         blogService
@@ -47,14 +50,19 @@ const App = () => {
             const createdBlog = await blogService.create(newBlog);
             blogFormRef.current.toggleVisibility();
             setBlogs(blogs.concat(createdBlog));
-            displayNotification(
-                `a new blog post ${createdBlog.title} by ${createdBlog.author} added`,
-                "success"
+            dispatch(
+                displayNotification(
+                    `a new blog post ${createdBlog.title} by ${createdBlog.author} added`,
+                    "success",
+                    4
+                )
             );
             success = true;
         } catch (error) {
             console.error(error);
-            displayNotification(error.response.data.error, "error");
+            dispatch(
+                displayNotification(error.response.data.error, "error", 4)
+            );
         }
         return success;
     };
@@ -73,13 +81,18 @@ const App = () => {
                     )
                     .sort((a, b) => b.likes - a.likes)
             );
-            displayNotification(
-                `Blog post ${updatedBlog.title} liked`,
-                "success"
+            dispatch(
+                displayNotification(
+                    `Blog post ${updatedBlog.title} liked`,
+                    "success",
+                    4
+                )
             );
         } catch (error) {
             console.error(error);
-            displayNotification(error.response.data.error, "error");
+            dispatch(
+                displayNotification(error.response.data.error, "error", 4)
+            );
         }
     };
 
@@ -94,10 +107,12 @@ const App = () => {
                     .filter(blog => blog.id !== id)
                     .sort((a, b) => b.likes - a.likes)
             );
-            displayNotification("Blog post deleted", "success");
+            dispatch(displayNotification("Blog post deleted", "success", 4));
         } catch (error) {
             console.error(error);
-            displayNotification(error.response.data.error, "error");
+            dispatch(
+                displayNotification(error.response.data.error, "error", 4)
+            );
         }
     };
 
@@ -116,17 +131,10 @@ const App = () => {
             blogService.setToken(response.token);
         } catch (error) {
             console.error(error);
-            displayNotification(error.response.data.error, "error");
+            dispatch(
+                displayNotification(error.response.data.error, "error", 4)
+            );
         }
-    };
-
-    const displayNotification = (message, type) => {
-        setNotificationMessage(message);
-        setNotificationType(type);
-        setTimeout(() => {
-            setNotificationMessage("");
-            setNotificationType("");
-        }, 3500);
     };
 
     const handleLogout = () => {
@@ -137,10 +145,10 @@ const App = () => {
 
     return (
         <div>
-            {notificationMessage && notificationType && (
+            {notification.message && notification.type && (
                 <Notification
-                    message={notificationMessage}
-                    type={notificationType}
+                    message={notification.message}
+                    type={notification.type}
                 />
             )}
             {!user ? (
