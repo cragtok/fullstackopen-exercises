@@ -23,18 +23,15 @@ const App = () => {
     const [user, setUser] = useState(null);
 
     const blogFormRef = useRef();
-
     const dispatch = useDispatch();
 
-    const blogs = useSelector(state => state.blogs);
+    const blogs = useSelector(state =>
+        [...state.blogs].sort((a, b) => b.likes - a.likes)
+    );
     const notification = useSelector(state => state.notification);
 
     useEffect(() => {
-        blogService
-            .getAll()
-            .then(blogs =>
-                dispatch(setBlogs(blogs.sort((a, b) => b.likes - a.likes)))
-            );
+        blogService.getAll().then(blogs => dispatch(setBlogs(blogs)));
     }, []);
 
     useEffect(() => {
@@ -45,55 +42,6 @@ const App = () => {
             blogService.setToken(user.token);
         }
     }, []);
-
-    const likeBlog = async oldBlog => {
-        try {
-            const updatedBlog = await blogService.update({
-                ...oldBlog,
-                likes: oldBlog.likes + 1,
-                user: oldBlog.user.id,
-            });
-            setBlogs(
-                blogs
-                    .map(blog =>
-                        blog.id === updatedBlog.id ? updatedBlog : blog
-                    )
-                    .sort((a, b) => b.likes - a.likes)
-            );
-            dispatch(
-                displayNotification(
-                    `Blog post ${updatedBlog.title} liked`,
-                    "success",
-                    4
-                )
-            );
-        } catch (error) {
-            console.error(error);
-            dispatch(
-                displayNotification(error.response.data.error, "error", 4)
-            );
-        }
-    };
-
-    const removeBlog = async id => {
-        if (!window.confirm("Are you sure?")) {
-            return;
-        }
-        try {
-            await blogService.remove(id);
-            setBlogs(
-                blogs
-                    .filter(blog => blog.id !== id)
-                    .sort((a, b) => b.likes - a.likes)
-            );
-            dispatch(displayNotification("Blog post deleted", "success", 4));
-        } catch (error) {
-            console.error(error);
-            dispatch(
-                displayNotification(error.response.data.error, "error", 4)
-            );
-        }
-    };
 
     const handleLogin = async e => {
         e.preventDefault();
@@ -151,12 +99,7 @@ const App = () => {
                         <BlogForm />
                     </Togglable>
                     <br />
-                    <BlogList
-                        removeBlog={removeBlog}
-                        likeBlog={likeBlog}
-                        blogs={blogs}
-                        loggedInUser={user.username}
-                    />
+                    <BlogList blogs={blogs} loggedInUser={user.username} />
                 </>
             )}
         </div>

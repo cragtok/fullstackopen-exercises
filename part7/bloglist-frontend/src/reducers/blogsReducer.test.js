@@ -55,21 +55,18 @@ describe("blogsReducer", () => {
         deepFreeze(initialState);
         const action = {
             type: "blogs/removeBlog",
-            payload: {
-                id: "2",
-            },
+            payload: "2",
         };
         const newState = blogsReducer(initialState, action);
         expect(newState).toHaveLength(initialState.length - 1);
         expect(newState.map(s => s.id)).not.toContainEqual(action.payload.id);
     });
     test("should return new state upon liking a blog", () => {
-        // Note: Change likeBlog reducer to pass test
         const initialState = [...blogsArray];
         deepFreeze(initialState);
         const action = {
-            type: "blogs/likeBlog",
-            payload: { ...initialState[0] },
+            type: "blogs/updateBlog",
+            payload: { ...initialState[0], likes: initialState.likes + 1 },
         };
         const newState = blogsReducer(initialState, action);
         expect(newState).toHaveLength(initialState.length);

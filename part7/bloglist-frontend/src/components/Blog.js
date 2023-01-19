@@ -1,6 +1,12 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 
-const Blog = ({ blog, likeBlog, removeBlog, showDeleteButton }) => {
+import { deleteBlog, likeBlog } from "../reducers/blogsReducer";
+import { displayNotification } from "../reducers/notificationReducer";
+
+const Blog = ({ blog, showDeleteButton }) => {
+    const dispatch = useDispatch();
+
     const [visible, setVisible] = useState(false);
 
     const blogStyle = {
@@ -15,12 +21,31 @@ const Blog = ({ blog, likeBlog, removeBlog, showDeleteButton }) => {
         setVisible(!visible);
     };
 
-    const handleLike = () => {
-        likeBlog(blog);
+    const handleLike = async () => {
+        const statusObj = await dispatch(likeBlog(blog));
+        if (statusObj.success) {
+            dispatch(
+                displayNotification(
+                    `Blog post ${blog.title} liked`,
+                    "success",
+                    4
+                )
+            );
+        } else {
+            dispatch(displayNotification(statusObj.message, "error", 4));
+        }
     };
 
-    const handleRemove = () => {
-        removeBlog(blog.id);
+    const handleRemove = async () => {
+        if (!window.confirm("Are you sure?")) {
+            return;
+        }
+        const statusObj = await dispatch(deleteBlog(blog.id));
+        if (statusObj.success) {
+            dispatch(displayNotification("Blog post deleted", "success", 4));
+        } else {
+            dispatch(displayNotification(statusObj.message, "error", 4));
+        }
     };
     return (
         <div style={blogStyle}>

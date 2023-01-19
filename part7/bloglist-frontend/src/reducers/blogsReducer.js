@@ -12,9 +12,9 @@ const blogsSlice = createSlice({
             return [...state, action.payload];
         },
         removeBlog(state, action) {
-            return state.filter(blog => blog.id !== action.payload.id);
+            return state.filter(blog => blog.id !== action.payload);
         },
-        likeBlog(state, action) {
+        updateBlog(state, action) {
             return state.map(blog =>
                 blog.id === action.payload.id ? action.payload : blog
             );
@@ -36,26 +36,33 @@ export const createBlog = blog => {
 
 export const deleteBlog = id => {
     return async dispatch => {
+        let statusObj;
         try {
             await blogService.remove(id);
-            dispatch(removeBlog(id));
-            return true;
+            statusObj = { success: true };
         } catch (error) {
-            return false;
+            statusObj = { success: false, message: error.response.data.error };
         }
+        dispatch(removeBlog(id));
+        return statusObj;
     };
 };
 
-export const like = blog => {
+export const likeBlog = blog => {
     return async dispatch => {
         try {
-            const updatedBlog = await blogService.update(blog);
-            dispatch(likeBlog(updatedBlog));
+            const updatedBlog = await blogService.update({
+                ...blog,
+                user: blog.user.id,
+                likes: blog.likes + 1,
+            });
+            dispatch(updateBlog(updatedBlog));
+            return { success: true };
         } catch (error) {
-            null;
+            return { success: false, message: error.response.data.error };
         }
     };
 };
 
-export const { setBlogs, addBlog, removeBlog, likeBlog } = blogsSlice.actions;
+export const { setBlogs, addBlog, removeBlog, updateBlog } = blogsSlice.actions;
 export default blogsSlice.reducer;
