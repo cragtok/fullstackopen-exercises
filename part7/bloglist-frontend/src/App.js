@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 import LoginForm from "./components/LoginForm";
 import BlogList from "./components/BlogList";
@@ -11,13 +12,11 @@ import blogService from "./services/blogs";
 import loginService from "./services/login";
 
 import { displayNotification } from "./reducers/notificationReducer";
+import { setBlogs } from "./reducers/blogsReducer";
 
 import "./App.css";
-import { useDispatch, useSelector } from "react-redux";
 
 const App = () => {
-    const [blogs, setBlogs] = useState([]);
-
     // LoginForm
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -27,12 +26,15 @@ const App = () => {
 
     const dispatch = useDispatch();
 
+    const blogs = useSelector(state => state.blogs);
     const notification = useSelector(state => state.notification);
 
     useEffect(() => {
         blogService
             .getAll()
-            .then(blogs => setBlogs(blogs.sort((a, b) => b.likes - a.likes)));
+            .then(blogs =>
+                dispatch(setBlogs(blogs.sort((a, b) => b.likes - a.likes)))
+            );
     }, []);
 
     useEffect(() => {
@@ -43,29 +45,6 @@ const App = () => {
             blogService.setToken(user.token);
         }
     }, []);
-
-    const createBlog = async newBlog => {
-        let success = false;
-        try {
-            const createdBlog = await blogService.create(newBlog);
-            blogFormRef.current.toggleVisibility();
-            setBlogs(blogs.concat(createdBlog));
-            dispatch(
-                displayNotification(
-                    `a new blog post ${createdBlog.title} by ${createdBlog.author} added`,
-                    "success",
-                    4
-                )
-            );
-            success = true;
-        } catch (error) {
-            console.error(error);
-            dispatch(
-                displayNotification(error.response.data.error, "error", 4)
-            );
-        }
-        return success;
-    };
 
     const likeBlog = async oldBlog => {
         try {
@@ -169,7 +148,7 @@ const App = () => {
                     <br />
                     <h2>create new</h2>
                     <Togglable ref={blogFormRef} buttonLabel="Create New Post">
-                        <BlogForm createBlog={createBlog} />
+                        <BlogForm />
                     </Togglable>
                     <br />
                     <BlogList

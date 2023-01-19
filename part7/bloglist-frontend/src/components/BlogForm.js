@@ -1,17 +1,31 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { createBlog } from "../reducers/blogsReducer";
+import { displayNotification } from "../reducers/notificationReducer";
 
-const BlogForm = ({ createBlog }) => {
+const BlogForm = () => {
     const [title, setTitle] = useState("");
     const [author, setAuthor] = useState("");
     const [url, setUrl] = useState("");
 
-    const addBlog = async (e) => {
+    const dispatch = useDispatch();
+
+    const addBlog = async e => {
         e.preventDefault();
-        const success = await createBlog({ title, author, url });
-        if (success) {
+        const statusObj = await dispatch(createBlog({ title, author, url }));
+        if (statusObj.success) {
+            dispatch(
+                displayNotification(
+                    `a new blog post ${title} by ${author} added`,
+                    "success",
+                    4
+                )
+            );
             setTitle("");
             setAuthor("");
             setUrl("");
+        } else {
+            dispatch(displayNotification(statusObj.message, "error", 4));
         }
     };
     return (
@@ -24,7 +38,7 @@ const BlogForm = ({ createBlog }) => {
                         type="text"
                         name="Title"
                         value={title}
-                        onChange={(e) => setTitle(e.target.value)}
+                        onChange={e => setTitle(e.target.value)}
                         placeholder="blog title..."
                     />
                 </div>
@@ -36,7 +50,7 @@ const BlogForm = ({ createBlog }) => {
                         type="text"
                         name="Author"
                         value={author}
-                        onChange={(e) => setAuthor(e.target.value)}
+                        onChange={e => setAuthor(e.target.value)}
                         placeholder="blog author..."
                     />
                 </div>
@@ -48,7 +62,7 @@ const BlogForm = ({ createBlog }) => {
                         type="text"
                         name="Url"
                         value={url}
-                        onChange={(e) => setUrl(e.target.value)}
+                        onChange={e => setUrl(e.target.value)}
                         placeholder="blog url..."
                     />
                 </div>
