@@ -1,12 +1,37 @@
-import React from "react";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 
-const LoginForm = ({
-    username,
-    password,
-    setUsername,
-    setPassword,
-    handleLogin,
-}) => {
+import blogService from "../services/blogs";
+
+import { displayNotification } from "../reducers/notificationReducer";
+import { loginUser } from "../reducers/userReducer";
+import { fetchBlogs } from "../reducers/blogsReducer";
+
+const LoginForm = () => {
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+
+    const dispatch = useDispatch();
+
+    const handleLogin = async e => {
+        e.preventDefault();
+        const statusObj = await dispatch(loginUser(username, password));
+
+        if (statusObj.success) {
+            setUsername("");
+            setPassword("");
+            window.localStorage.clear();
+            window.localStorage.setItem(
+                "loggedInUser",
+                JSON.stringify(statusObj.loggedInUser)
+            );
+            blogService.setToken(statusObj.loggedInUser.token);
+            dispatch(fetchBlogs());
+        } else {
+            dispatch(displayNotification(statusObj.message, "error", 4));
+        }
+    };
+
     return (
         <div>
             <form onSubmit={handleLogin}>
@@ -17,7 +42,7 @@ const LoginForm = ({
                         type="text"
                         name="Username"
                         value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        onChange={e => setUsername(e.target.value)}
                     />
                 </div>
                 <div>
@@ -27,7 +52,7 @@ const LoginForm = ({
                         type="password"
                         name="Password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={e => setPassword(e.target.value)}
                     />
                 </div>
                 <button id="login-button">Login</button>

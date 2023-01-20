@@ -22,6 +22,14 @@ const blogsSlice = createSlice({
     },
 });
 
+export const fetchBlogs = () => {
+    return async dispatch => {
+        blogService.getAll().then(blogs => {
+            dispatch(setBlogs(blogs));
+        });
+    };
+};
+
 export const createBlog = blog => {
     return async dispatch => {
         try {
