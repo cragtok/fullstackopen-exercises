@@ -11,12 +11,6 @@ const userSlice = createSlice({
     },
 });
 
-export const setToken = user => {
-    return async dispatch => {
-        dispatch(setUser(user));
-    };
-};
-
 export const loginUser = (username, password) => {
     return async dispatch => {
         try {

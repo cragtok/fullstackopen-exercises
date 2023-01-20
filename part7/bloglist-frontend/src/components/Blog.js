@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 
 import { deleteBlog, likeBlog } from "../reducers/blogsReducer";
 import { displayNotification } from "../reducers/notificationReducer";
+import { removeUserBlog } from "../reducers/usersReducer";
 
 const Blog = ({ blog, showDeleteButton }) => {
     const dispatch = useDispatch();
@@ -43,6 +44,7 @@ const Blog = ({ blog, showDeleteButton }) => {
         const statusObj = await dispatch(deleteBlog(blog.id));
         if (statusObj.success) {
             dispatch(displayNotification("Blog post deleted", "success", 4));
+            dispatch(removeUserBlog({ blogId: blog.id, userId: blog.user.id }));
         } else {
             dispatch(displayNotification(statusObj.message, "error", 4));
         }

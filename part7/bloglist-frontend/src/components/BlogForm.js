@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { createBlog } from "../reducers/blogsReducer";
 import { displayNotification } from "../reducers/notificationReducer";
+import { addUserBlog } from "../reducers/usersReducer";
 
-const BlogForm = () => {
+const BlogForm = ({ toggleVisibility }) => {
     const [title, setTitle] = useState("");
     const [author, setAuthor] = useState("");
     const [url, setUrl] = useState("");
@@ -14,6 +15,10 @@ const BlogForm = () => {
         e.preventDefault();
         const statusObj = await dispatch(createBlog({ title, author, url }));
         if (statusObj.success) {
+            setTitle("");
+            setAuthor("");
+            setUrl("");
+            dispatch(addUserBlog(statusObj.newBlog));
             dispatch(
                 displayNotification(
                     `a new blog post ${title} by ${author} added`,
@@ -21,9 +26,7 @@ const BlogForm = () => {
                     4
                 )
             );
-            setTitle("");
-            setAuthor("");
-            setUrl("");
+            toggleVisibility();
         } else {
             dispatch(displayNotification(statusObj.message, "error", 4));
         }

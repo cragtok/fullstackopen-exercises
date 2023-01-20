@@ -35,7 +35,7 @@ export const createBlog = blog => {
         try {
             const newBlog = await blogService.create(blog);
             dispatch(addBlog(newBlog));
-            return { success: true };
+            return { success: true, newBlog };
         } catch (error) {
             return { success: false, message: error.response.data.error };
         }

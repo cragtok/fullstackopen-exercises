@@ -5,6 +5,7 @@ import { logoutUser } from "../reducers/userReducer";
 import { setBlogs } from "../reducers/blogsReducer";
 
 import blogService from "../services/blogs";
+import { setUsers } from "../reducers/usersReducer";
 
 const Logout = ({ name }) => {
     const dispatch = useDispatch();
@@ -13,6 +14,7 @@ const Logout = ({ name }) => {
         window.localStorage.removeItem("loggedInUser");
         blogService.setToken(null);
         dispatch(setBlogs([]));
+        dispatch(setUsers([]));
     };
 
     return (

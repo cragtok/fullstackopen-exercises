@@ -6,6 +6,7 @@ import blogService from "../services/blogs";
 import { displayNotification } from "../reducers/notificationReducer";
 import { loginUser } from "../reducers/userReducer";
 import { fetchBlogs } from "../reducers/blogsReducer";
+import { fetchUsers } from "../reducers/usersReducer";
 
 const LoginForm = () => {
     const [username, setUsername] = useState("");
@@ -27,6 +28,7 @@ const LoginForm = () => {
             );
             blogService.setToken(statusObj.loggedInUser.token);
             dispatch(fetchBlogs());
+            dispatch(fetchUsers());
         } else {
             dispatch(displayNotification(statusObj.message, "error", 4));
         }
