@@ -29,7 +29,7 @@ const Home = ({ blogs }) => {
                     />
                 </Togglable>
                 <br />
-                <BlogList blogs={blogs} loggedInUser={loggedInUser} />
+                <BlogList blogs={blogs} />
             </>
         </div>
     );

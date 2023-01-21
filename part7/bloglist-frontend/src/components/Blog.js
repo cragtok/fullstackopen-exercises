@@ -1,26 +1,18 @@
-import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { useLoggedInUser } from "../hooks";
 
 import { deleteBlog, likeBlog } from "../reducers/blogsReducer";
 import { displayNotification } from "../reducers/notificationReducer";
 import { removeUserBlog } from "../reducers/usersReducer";
 
-const Blog = ({ blog, showDeleteButton }) => {
+const Blog = () => {
     const dispatch = useDispatch();
+    const id = useParams().id;
+    const navigate = useNavigate();
+    const blog = useSelector(state => state.blogs.find(blog => blog.id === id));
 
-    const [visible, setVisible] = useState(false);
-
-    const blogStyle = {
-        paddingTop: 10,
-        paddingLeft: 2,
-        border: "solid",
-        borderWidth: 1,
-        marginBottom: 5,
-    };
-
-    const toggleVisibility = () => {
-        setVisible(!visible);
-    };
+    const loggedInUser = useLoggedInUser();
 
     const handleLike = async () => {
         const statusObj = await dispatch(likeBlog(blog));
@@ -45,35 +37,37 @@ const Blog = ({ blog, showDeleteButton }) => {
         if (statusObj.success) {
             dispatch(displayNotification("Blog post deleted", "success", 4));
             dispatch(removeUserBlog({ blogId: blog.id, userId: blog.user.id }));
+            navigate("/");
         } else {
             dispatch(displayNotification(statusObj.message, "error", 4));
         }
     };
 
+    if (!blog) {
+        return <p>Blog not found</p>;
+    }
+
+    const showDeleteButton = blog.user.id === loggedInUser.user.id;
+
     return (
-        <div style={blogStyle}>
-            {!visible ? (
-                <div className="blog-titleAuthor">
-                    {blog.title} {blog.author}{" "}
-                    <button onClick={toggleVisibility}>view</button>
-                </div>
-            ) : (
-                <div>
-                    <p>
-                        {blog.title}{" "}
-                        <button onClick={toggleVisibility}>hide</button>
-                    </p>
-                    <p className="blog-url">{blog.url}</p>
-                    <p className="blog-likes">
-                        Likes {blog.likes}{" "}
-                        <button onClick={handleLike}>like</button>
-                    </p>
-                    <p>{blog.author}</p>
-                    {showDeleteButton && (
-                        <button onClick={handleRemove}>Delete</button>
-                    )}
-                </div>
-            )}
+        <div>
+            <h1>{blog.title} </h1>
+            <br />
+            <a
+                className="blog-url"
+                href={
+                    blog.url.includes("http://")
+                        ? blog.url
+                        : `http://${blog.url}`
+                }
+            >
+                {blog.url}
+            </a>
+            <p className="blog-likes">
+                {blog.likes} likes <button onClick={handleLike}>like</button>
+            </p>
+            <p> added by {blog.author}</p>
+            {showDeleteButton && <button onClick={handleRemove}>Delete</button>}
         </div>
     );
 };

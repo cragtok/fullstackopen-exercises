@@ -7,6 +7,7 @@ import Notification from "./components/Notification";
 import Users from "./components/Users";
 import LoginForm from "./components/LoginForm";
 import User from "./components/User";
+import Blog from "./components/Blog";
 
 import blogService from "./services/blogs";
 import usersService from "./services/users";
@@ -78,6 +79,16 @@ const App = () => {
                     element={
                         isLoggedIn() ? (
                             <Users users={users} />
+                        ) : (
+                            <Navigate replace to="/login" />
+                        )
+                    }
+                />
+                <Route
+                    path="/blogs/:id"
+                    element={
+                        isLoggedIn() ? (
+                            <Blog />
                         ) : (
                             <Navigate replace to="/login" />
                         )

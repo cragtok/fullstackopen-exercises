@@ -1,7 +1,15 @@
-import Blog from "./Blog";
 import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
 
-const BlogList = ({ blogs, loggedInUser }) => {
+const blogStyle = {
+    paddingTop: 10,
+    paddingLeft: 2,
+    border: "solid",
+    borderWidth: 1,
+    marginBottom: 5,
+};
+
+const BlogList = ({ blogs }) => {
     if (blogs.length === 0) {
         return null;
     }
@@ -9,11 +17,11 @@ const BlogList = ({ blogs, loggedInUser }) => {
     return (
         <div>
             {blogs.map(blog => (
-                <Blog
-                    key={blog.id}
-                    blog={blog}
-                    showDeleteButton={blog.user.id === loggedInUser.user.id}
-                />
+                <div style={blogStyle} key={blog.id}>
+                    <Link to={`/blogs/${blog.id}`}>
+                        {blog.title} by {blog.author}
+                    </Link>
+                </div>
             ))}
         </div>
     );

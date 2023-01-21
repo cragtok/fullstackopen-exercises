@@ -21,8 +21,6 @@ const LoginForm = () => {
         const statusObj = await dispatch(loginUser(username, password));
 
         if (statusObj.success) {
-            setUsername("");
-            setPassword("");
             window.localStorage.clear();
             window.localStorage.setItem(
                 "loggedInUser",
@@ -31,6 +29,8 @@ const LoginForm = () => {
             blogService.setToken(statusObj.loggedInUser.token);
             await dispatch(fetchBlogs());
             await dispatch(fetchUsers());
+            setUsername("");
+            setPassword("");
             navigate("/");
         } else {
             dispatch(displayNotification(statusObj.message, "error", 4));
