@@ -49,14 +49,14 @@ const App = () => {
 
     return (
         <div>
+            {isLoggedIn() && <Navbar />}
+
             {notification.message && notification.type && (
                 <Notification
                     message={notification.message}
                     type={notification.type}
                 />
             )}
-
-            {isLoggedIn() && <Navbar />}
 
             <Routes>
                 <Route

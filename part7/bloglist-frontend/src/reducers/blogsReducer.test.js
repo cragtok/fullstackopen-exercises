@@ -13,6 +13,7 @@ const blogsArray = [
             name: "user1",
             username: "user1",
         },
+        comments: [],
     },
     {
         author: "user2",
@@ -25,6 +26,7 @@ const blogsArray = [
             name: "user2",
             username: "user2",
         },
+        comments: [],
     },
 ];
 
@@ -44,6 +46,7 @@ describe("blogsReducer", () => {
                 user: {
                     ...initialState[0]["user"],
                 },
+                comments: [],
             },
         };
         const newState = blogsReducer(initialState, action);
@@ -72,5 +75,26 @@ describe("blogsReducer", () => {
         expect(newState).toHaveLength(initialState.length);
         const likedBlog = newState.find(blog => blog.id === action.payload.id);
         expect(likedBlog.likes).toBe(action.payload.likes + 1);
+    });
+
+    test("should return new state upon adding a new comment to a blog", () => {
+        const initialState = [...blogsArray];
+        deepFreeze(initialState);
+        const blog = {
+            ...blogsArray[0],
+            user: { ...blogsArray[0].user },
+            comments: [...blogsArray[0].comments],
+        };
+        const action = {
+            type: "blogs/addComment",
+            payload: { comment: "Comment", blogId: blog.id },
+        };
+        const newState = blogsReducer(initialState, action);
+
+        const commentedBlog = newState.find(b => b.id === blog.id);
+
+        expect(commentedBlog.comments.length).toBe(blog.comments.length + 1);
+
+        expect(commentedBlog.comments).toContainEqual("Comment");
     });
 });

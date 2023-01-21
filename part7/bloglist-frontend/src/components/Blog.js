@@ -5,6 +5,9 @@ import { useLoggedInUser } from "../hooks";
 import { deleteBlog, likeBlog } from "../reducers/blogsReducer";
 import { displayNotification } from "../reducers/notificationReducer";
 import { removeUserBlog } from "../reducers/usersReducer";
+import { postComment } from "../reducers/blogsReducer";
+
+import CommentForm from "./CommentForm";
 
 const Blog = () => {
     const dispatch = useDispatch();
@@ -43,6 +46,15 @@ const Blog = () => {
         }
     };
 
+    const addComment = async comment => {
+        const statusObj = await dispatch(postComment(blog.id, comment));
+        if (statusObj.success) {
+            dispatch(displayNotification("Comment Added", "success", 2));
+        } else {
+            dispatch(displayNotification(statusObj.message, "error", 4));
+        }
+    };
+
     if (!blog) {
         return <p>Blog not found</p>;
     }
@@ -70,10 +82,15 @@ const Blog = () => {
             {showDeleteButton && <button onClick={handleRemove}>Delete</button>}
             <div>
                 <h2>comments</h2>
-                {blog.comments.length > 0 &&
-                    blog.comments.map(comment => (
-                        <li key={crypto.randomUUID()}>{comment}</li>
-                    ))}
+                <CommentForm addComment={addComment} />
+                <br />
+                {blog.comments.length > 0 && (
+                    <ul>
+                        {blog.comments.map(comment => (
+                            <li key={crypto.randomUUID()}>{comment}</li>
+                        ))}
+                    </ul>
+                )}
             </div>
         </div>
     );
