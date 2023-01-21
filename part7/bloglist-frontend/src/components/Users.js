@@ -1,8 +1,17 @@
 import React from "react";
+import { Link } from "react-router-dom";
+
+import { useLoggedInUser } from "../hooks";
 
 const Users = ({ users }) => {
+    const loggedInUser = useLoggedInUser();
+    if (!loggedInUser.isLoggedIn()) {
+        return null;
+    }
+
     return (
         <div>
+            <h2>Users</h2>
             <table>
                 <thead>
                     <tr>
@@ -13,7 +22,11 @@ const Users = ({ users }) => {
                 <tbody>
                     {users.map(user => (
                         <tr key={user.id}>
-                            <td>{user.name}</td>
+                            <td>
+                                <Link to={`/users/${user.id}`}>
+                                    {user.name}
+                                </Link>{" "}
+                            </td>
                             <td style={{ textAlign: "right" }}>
                                 {user.blogs.length}
                             </td>

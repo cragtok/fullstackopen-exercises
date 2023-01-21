@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
 import blogService from "../services/blogs";
@@ -12,6 +13,7 @@ const LoginForm = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
+    const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const handleLogin = async e => {
@@ -27,8 +29,9 @@ const LoginForm = () => {
                 JSON.stringify(statusObj.loggedInUser)
             );
             blogService.setToken(statusObj.loggedInUser.token);
-            dispatch(fetchBlogs());
-            dispatch(fetchUsers());
+            await dispatch(fetchBlogs());
+            await dispatch(fetchUsers());
+            navigate("/");
         } else {
             dispatch(displayNotification(statusObj.message, "error", 4));
         }
@@ -36,6 +39,7 @@ const LoginForm = () => {
 
     return (
         <div>
+            <h2>Log in to application</h2>
             <form onSubmit={handleLogin}>
                 <div>
                     Username:{" "}

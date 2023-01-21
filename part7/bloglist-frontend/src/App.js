@@ -1,35 +1,32 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Routes, Route, Navigate } from "react-router-dom";
 
-import LoginForm from "./components/LoginForm";
-import BlogList from "./components/BlogList";
-import Logout from "./components/Logout";
-import BlogForm from "./components/BlogForm";
+import Home from "./components/Home";
 import Notification from "./components/Notification";
-import Togglable from "./components/Togglable";
 import Users from "./components/Users";
+import LoginForm from "./components/LoginForm";
+import User from "./components/User";
 
 import blogService from "./services/blogs";
 import usersService from "./services/users";
 
 import { setBlogs } from "./reducers/blogsReducer";
 import { setUser } from "./reducers/userReducer";
-
-import "./App.css";
 import { setUsers } from "./reducers/usersReducer";
 
-const App = () => {
-    const blogFormRef = useRef();
+import "./App.css";
+import Logout from "./components/Logout";
 
+const App = () => {
     const dispatch = useDispatch();
 
-    const blogs = useSelector(state =>
-        [...state.blogs].sort((a, b) => b.likes - a.likes)
-    );
     const notification = useSelector(state => state.notification);
-    const user = useSelector(state => state.user);
     const users = useSelector(state =>
         [...state.users].sort((a, b) => b.blogs.length - a.blogs.length)
+    );
+    const blogs = useSelector(state =>
+        [...state.blogs].sort((a, b) => b.likes - a.likes)
     );
 
     useEffect(() => {
@@ -43,6 +40,12 @@ const App = () => {
         }
     }, []);
 
+    const isLoggedIn = () => {
+        return window.localStorage.getItem("loggedInUser") !== null
+            ? true
+            : false;
+    };
+
     return (
         <div>
             {notification.message && notification.type && (
@@ -51,30 +54,56 @@ const App = () => {
                     type={notification.type}
                 />
             )}
-            {JSON.stringify(user) === "{}" ? (
-                <>
-                    <h2>Log in to application</h2>
-                    <LoginForm />
-                </>
-            ) : (
+            {isLoggedIn() && (
                 <>
                     <h2>blogs</h2>
-                    <Logout name={user.name} />
-                    <h2>Users</h2>
-                    <Users users={users} />
+                    <Logout />
                     <br />
-                    <h2>create new</h2>
-                    <Togglable ref={blogFormRef} buttonLabel="Create New Post">
-                        <BlogForm
-                            toggleVisibility={() => {
-                                blogFormRef.current.toggleVisibility();
-                            }}
-                        />
-                    </Togglable>
-                    <br />
-                    <BlogList blogs={blogs} loggedInUser={user.username} />
                 </>
             )}
+
+            <Routes>
+                <Route
+                    path="/users/:id"
+                    element={
+                        isLoggedIn() ? (
+                            <User />
+                        ) : (
+                            <Navigate replace to="/login" />
+                        )
+                    }
+                />
+                <Route
+                    path="/users"
+                    element={
+                        isLoggedIn() ? (
+                            <Users users={users} />
+                        ) : (
+                            <Navigate replace to="/login" />
+                        )
+                    }
+                />
+                <Route
+                    path="/login"
+                    element={
+                        isLoggedIn() ? (
+                            <Navigate replace to="/" />
+                        ) : (
+                            <LoginForm />
+                        )
+                    }
+                />
+                <Route
+                    path="/"
+                    element={
+                        isLoggedIn() ? (
+                            <Home blogs={blogs} />
+                        ) : (
+                            <Navigate replace to="/login" />
+                        )
+                    }
+                />
+            </Routes>
         </div>
     );
 };

@@ -30,13 +30,11 @@ describe("userReducer", () => {
 
         const action = {
             type: "user/setUser",
-            payload: {},
+            payload: null,
         };
 
         const newState = userReducer(initialState, action);
 
-        expect(newState.token).toBe(undefined);
-        expect(newState.name).toBe(undefined);
-        expect(newState.username).toBe(undefined);
+        expect(newState).toBe(null);
     });
 });

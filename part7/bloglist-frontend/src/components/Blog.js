@@ -49,6 +49,7 @@ const Blog = ({ blog, showDeleteButton }) => {
             dispatch(displayNotification(statusObj.message, "error", 4));
         }
     };
+
     return (
         <div style={blogStyle}>
             {!visible ? (

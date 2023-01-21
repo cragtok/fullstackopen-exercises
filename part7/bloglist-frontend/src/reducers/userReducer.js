@@ -3,7 +3,7 @@ import loginService from "../services/login";
 
 const userSlice = createSlice({
     name: "user",
-    initialState: {},
+    initialState: null,
     reducers: {
         setUser(state, action) {
             return action.payload;
@@ -28,7 +28,7 @@ export const loginUser = (username, password) => {
 
 export const logoutUser = () => {
     return async dispatch => {
-        dispatch(setUser({}));
+        dispatch(setUser(null));
     };
 };
 export const { setUser } = userSlice.actions;
