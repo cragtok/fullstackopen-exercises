@@ -107,4 +107,32 @@ blogsRouter.put("/:id", async (request, response, next) => {
     }
 });
 
+// Blog Comment Routers
+
+blogsRouter.post("/:id/comments", async (request, response, next) => {
+    const body = request.body;
+    const comment = body.comment;
+    const user = request.user;
+
+    if (!user) {
+        return response.status(401).json({ error: "token missing or invalid" });
+    }
+
+    if (!comment || comment.length < 1) {
+        return response.status(400).json({ error: "Comment missing" });
+    }
+
+    try {
+        const blog = await Blog.findById(request.params.id);
+        if (!blog) {
+            return response.status(400).json({ error: "Blog not found" });
+        }
+        blog.comments = blog.comments.concat(comment);
+        await blog.save();
+        response.status(201).json({ comment });
+    } catch (error) {
+        next(error);
+    }
+});
+
 module.exports = blogsRouter;

@@ -68,6 +68,13 @@ const Blog = () => {
             </p>
             <p> added by {blog.author}</p>
             {showDeleteButton && <button onClick={handleRemove}>Delete</button>}
+            <div>
+                <h2>comments</h2>
+                {blog.comments.length > 0 &&
+                    blog.comments.map(comment => (
+                        <li key={crypto.randomUUID()}>{comment}</li>
+                    ))}
+            </div>
         </div>
     );
 };

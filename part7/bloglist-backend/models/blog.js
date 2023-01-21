@@ -27,7 +27,7 @@ const blogSchema = new mongoose.Schema({
                 ); // fragment locator
                 return pattern.test(v);
             },
-            message: (props) => `${props.value} is not a valid url.`,
+            message: props => `${props.value} is not a valid url.`,
         },
         required: [true, "Blog url required."],
     },
@@ -39,6 +39,7 @@ const blogSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
     },
+    comments: [{ type: "String" }],
 });
 
 blogSchema.set("toJSON", {
