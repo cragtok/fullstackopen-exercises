@@ -8,6 +8,7 @@ import Users from "./components/Users";
 import LoginForm from "./components/LoginForm";
 import User from "./components/User";
 import Blog from "./components/Blog";
+import Navbar from "./components/Navbar";
 
 import blogService from "./services/blogs";
 import usersService from "./services/users";
@@ -17,7 +18,6 @@ import { setUser } from "./reducers/userReducer";
 import { setUsers } from "./reducers/usersReducer";
 
 import "./App.css";
-import Logout from "./components/Logout";
 
 const App = () => {
     const dispatch = useDispatch();
@@ -55,13 +55,8 @@ const App = () => {
                     type={notification.type}
                 />
             )}
-            {isLoggedIn() && (
-                <>
-                    <h2>blogs</h2>
-                    <Logout />
-                    <br />
-                </>
-            )}
+
+            {isLoggedIn() && <Navbar />}
 
             <Routes>
                 <Route

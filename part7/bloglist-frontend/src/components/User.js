@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useLoggedInUser } from "../hooks";
 
 const User = () => {
@@ -25,7 +25,9 @@ const User = () => {
             <h1>{user.name}</h1>
             <h2>added blogs</h2>
             {user.blogs.map(blog => (
-                <li key={blog.id}>{blog.title}</li>
+                <div key={blog.id}>
+                    <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+                </div>
             ))}
         </div>
     );

@@ -17,6 +17,7 @@ const Home = ({ blogs }) => {
     return (
         <div>
             <>
+                <h2>Blog App</h2>
                 <Togglable
                     title="create new"
                     ref={blogFormRef}
