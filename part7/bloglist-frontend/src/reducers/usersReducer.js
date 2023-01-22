@@ -68,6 +68,7 @@ const usersSlice = createSlice({
                         ),
                     };
                 }
+
                 return user;
             });
         },
