@@ -9,6 +9,7 @@ import LoginForm from "./components/LoginForm";
 import User from "./components/User";
 import Blog from "./components/Blog";
 import Navbar from "./components/Navbar";
+import SignupForm from "./components/SignupForm";
 
 import blogService from "./services/blogs";
 import usersService from "./services/users";
@@ -48,7 +49,7 @@ const App = () => {
     };
 
     return (
-        <div>
+        <div className="container">
             {isLoggedIn() && <Navbar />}
 
             {notification.message && notification.type && (
@@ -100,6 +101,17 @@ const App = () => {
                     }
                 />
                 <Route
+                    path="/register"
+                    element={
+                        isLoggedIn() ? (
+                            <Navigate replace to="/" />
+                        ) : (
+                            <SignupForm />
+                        )
+                    }
+                />
+                <Route
+                    exact
                     path="/"
                     element={
                         isLoggedIn() ? (

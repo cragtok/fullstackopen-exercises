@@ -88,6 +88,7 @@ export const likeBlog = blog => {
                 ...blog,
                 user: blog.user.id,
                 likes: blog.likes + 1,
+                action: "like",
             });
             dispatch(updateBlog(updatedBlog));
             return { success: true };
@@ -97,6 +98,22 @@ export const likeBlog = blog => {
     };
 };
 
+export const unlikeBlog = blog => {
+    return async dispatch => {
+        try {
+            const updatedBlog = await blogService.update({
+                ...blog,
+                user: blog.user.id,
+                likes: blog.likes - 1,
+                action: "unlike",
+            });
+            dispatch(updateBlog(updatedBlog));
+            return { success: true };
+        } catch (error) {
+            return { success: false, message: error.response.data.error };
+        }
+    };
+};
 export const { setBlogs, addBlog, removeBlog, updateBlog, addComment } =
     blogsSlice.actions;
 export default blogsSlice.reducer;

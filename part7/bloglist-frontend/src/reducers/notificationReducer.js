@@ -11,7 +11,7 @@ const notificationSlice = createSlice({
     initialState,
     reducers: {
         setNotification(state, action) {
-            if (state.timerRef) {
+            if (state.timerRef !== null) {
                 clearTimeout(state.timerRef);
             }
             return {
@@ -20,7 +20,8 @@ const notificationSlice = createSlice({
                 timerRef: action.payload.time,
             };
         },
-        removeNotification() {
+        removeNotification(state) {
+            clearTimeout(state.timerRef);
             return { ...initialState };
         },
     },

@@ -3,13 +3,16 @@ const mongoose = require("mongoose");
 const blogSchema = new mongoose.Schema({
     title: {
         type: String,
-        required: [true, "Blog title required."],
-        minlength: 5,
+        unique: [true, "Blog title is already taken"],
+        required: [true, "Blog title required"],
+        minlength: [5, "Blog title must be at least 5 characters long"],
+        maxlength: [35, "Blog title must be shorter than 36 characters"],
     },
     author: {
         type: String,
-        required: [true, "Author name required."],
-        minlength: 3,
+        required: [true, "Author name required"],
+        minlength: [3, "Author name must be at least 3 characters long"],
+        maxlength: [20, "Author name must be shorter than 21 characters"],
     },
     url: {
         type: String,
@@ -40,6 +43,7 @@ const blogSchema = new mongoose.Schema({
         ref: "User",
     },
     comments: [{ type: "String" }],
+    userLikes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 });
 
 blogSchema.set("toJSON", {

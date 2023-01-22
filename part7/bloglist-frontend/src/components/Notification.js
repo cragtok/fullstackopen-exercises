@@ -2,9 +2,13 @@ import React from "react";
 
 const Notification = ({ message, type }) => {
     return (
-        <div>
-            <div className={`notification-${type}`}>{message}</div>
-        </div>
+        <article
+            className={`message mt-2 ${
+                type === "error" ? "is-danger" : "is-success"
+            }`}
+        >
+            <div className="message-body">{message}</div>
+        </article>
     );
 };
 

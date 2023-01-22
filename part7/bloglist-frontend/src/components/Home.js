@@ -17,11 +17,15 @@ const Home = ({ blogs }) => {
     return (
         <div>
             <>
-                <h2>Blog App</h2>
+                <h2 className="title is-2 mt-5">Blog App</h2>
                 <Togglable
-                    title="create new"
+                    title=""
                     ref={blogFormRef}
                     buttonLabel="Create New Post"
+                    style={{
+                        marginLeft: "1%",
+                        marginRight: "1%",
+                    }}
                 >
                     <BlogForm
                         toggleVisibility={() => {

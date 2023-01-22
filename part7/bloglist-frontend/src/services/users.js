@@ -12,5 +12,14 @@ const getOne = async id => {
     return response.data;
 };
 
-const usersService = { getAll, getOne };
+const create = async (username, name, password) => {
+    const response = await axios.post(baseUrl, {
+        username,
+        password,
+        name,
+    });
+    return response.data;
+};
+
+const usersService = { getAll, getOne, create };
 export default usersService;

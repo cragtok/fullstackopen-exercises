@@ -1,51 +1,57 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-
-import blogService from "../services/blogs";
+import { Link, useNavigate } from "react-router-dom";
 
 import { displayNotification } from "../reducers/notificationReducer";
 import { loginUser } from "../reducers/userReducer";
 import { fetchBlogs } from "../reducers/blogsReducer";
 import { fetchUsers } from "../reducers/usersReducer";
 
-const LoginForm = () => {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+import blogService from "../services/blogs";
+import usersService from "../services/users";
 
+const SignupForm = () => {
+    const [username, setUsername] = useState("");
+    const [name, setName] = useState("");
+    const [password, setPassword] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const notification = useSelector(state => state.notification);
-    const navigate = useNavigate();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const notification = useSelector(state => state.notification);
 
-    const handleLogin = async e => {
-        e.preventDefault();
+    const handleRegister = async e => {
         setIsSubmitting(true);
-        const statusObj = await dispatch(loginUser(username, password));
-        if (statusObj.success) {
-            window.localStorage.clear();
-            window.localStorage.setItem(
-                "loggedInUser",
-                JSON.stringify(statusObj.loggedInUser)
-            );
-            blogService.setToken(statusObj.loggedInUser.token);
-            await dispatch(fetchBlogs());
-            await dispatch(fetchUsers());
-            setUsername("");
-            setIsSubmitting(false);
-            setPassword("");
-            navigate("/");
-        } else {
+        e.preventDefault();
+        try {
+            await usersService.create(username, name, password);
+            const statusObj = await dispatch(loginUser(username, password));
+            if (statusObj.success) {
+                window.localStorage.clear();
+                window.localStorage.setItem(
+                    "loggedInUser",
+                    JSON.stringify(statusObj.loggedInUser)
+                );
+
+                blogService.setToken(statusObj.loggedInUser.token);
+                await dispatch(fetchBlogs());
+                await dispatch(fetchUsers());
+                navigate("/");
+                return;
+            }
             dispatch(displayNotification(statusObj.message, "error", 4));
+            setIsSubmitting(false);
+        } catch (error) {
+            dispatch(
+                displayNotification(error.response.data.error, "error", 4)
+            );
             setIsSubmitting(false);
         }
     };
-
     return (
         <div>
-            <h2 className="title is-2">Log in to application</h2>
-            <form onSubmit={handleLogin}>
+            <h2 className="title is-2">Register</h2>
+            <form onSubmit={handleRegister}>
                 <div>
                     <label className="label">Username:</label>
                     <input
@@ -57,6 +63,20 @@ const LoginForm = () => {
                         name="Username"
                         value={username}
                         onChange={e => setUsername(e.target.value)}
+                    />
+                </div>
+                <br />
+                <div>
+                    <label className="label">Name:</label>
+                    <input
+                        className={`input${
+                            notification.type === "error" ? " is-danger" : ""
+                        }`}
+                        id="login-name"
+                        type="text"
+                        name="name"
+                        value={name}
+                        onChange={e => setName(e.target.value)}
                     />
                 </div>
                 <br />
@@ -81,15 +101,14 @@ const LoginForm = () => {
                     }`}
                     disabled={isSubmitting}
                 >
-                    Login
+                    Register
                 </button>
-                <Link to="/register">
-                    <button className="button ml-3">Register</button>
+                <Link to="/login">
+                    <button className="button ml-3">Sign In</button>
                 </Link>
             </form>
-            <br />
         </div>
     );
 };
 
-export default LoginForm;
+export default SignupForm;

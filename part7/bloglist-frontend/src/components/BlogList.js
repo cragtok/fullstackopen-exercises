@@ -1,13 +1,5 @@
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
-
-const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: "solid",
-    borderWidth: 1,
-    marginBottom: 5,
-};
+import BlogLink from "./BlogLink";
 
 const BlogList = ({ blogs }) => {
     if (blogs.length === 0) {
@@ -17,11 +9,12 @@ const BlogList = ({ blogs }) => {
     return (
         <div>
             {blogs.map(blog => (
-                <div style={blogStyle} key={blog.id}>
-                    <Link to={`/blogs/${blog.id}`}>
-                        {blog.title} by {blog.author}
-                    </Link>
-                </div>
+                <BlogLink
+                    key={blog.id}
+                    id={blog.id}
+                    title={blog.title}
+                    author={blog.author}
+                />
             ))}
         </div>
     );

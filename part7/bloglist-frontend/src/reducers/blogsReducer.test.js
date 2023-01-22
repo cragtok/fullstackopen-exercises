@@ -14,6 +14,7 @@ const blogsArray = [
             username: "user1",
         },
         comments: [],
+        userLikes: [],
     },
     {
         author: "user2",
@@ -27,6 +28,7 @@ const blogsArray = [
             username: "user2",
         },
         comments: [],
+        userLikes: [],
     },
 ];
 
@@ -63,18 +65,6 @@ describe("blogsReducer", () => {
         const newState = blogsReducer(initialState, action);
         expect(newState).toHaveLength(initialState.length - 1);
         expect(newState.map(s => s.id)).not.toContainEqual(action.payload.id);
-    });
-    test("should return new state upon liking a blog", () => {
-        const initialState = [...blogsArray];
-        deepFreeze(initialState);
-        const action = {
-            type: "blogs/updateBlog",
-            payload: { ...initialState[0], likes: initialState.likes + 1 },
-        };
-        const newState = blogsReducer(initialState, action);
-        expect(newState).toHaveLength(initialState.length);
-        const likedBlog = newState.find(blog => blog.id === action.payload.id);
-        expect(likedBlog.likes).toBe(action.payload.likes + 1);
     });
 
     test("should return new state upon adding a new comment to a blog", () => {

@@ -5,6 +5,7 @@ blogsRouter.get("/", async (request, response) => {
     const blogs = await Blog.find({}).populate("user", {
         username: 1,
         name: 1,
+        userLikes: 1,
     });
     response.json(blogs);
 });
@@ -14,6 +15,7 @@ blogsRouter.get("/:id", async (request, response, next) => {
         const blog = await Blog.findById(request.params.id).populate("user", {
             username: 1,
             name: 1,
+            userLikes: 1,
         });
         if (blog) {
             response.json(blog);
@@ -41,7 +43,11 @@ blogsRouter.post("/", async (request, response, next) => {
         const newBlog = await blog.save();
         user.blogs = user.blogs.concat(newBlog._id);
         await user.save();
-        await newBlog.populate("user", { username: 1, name: 1 });
+        await newBlog.populate("user", {
+            username: 1,
+            name: 1,
+            userLikes: 1,
+        });
         response.status(201).json(newBlog);
     } catch (error) {
         next(error);
@@ -83,14 +89,57 @@ blogsRouter.put("/:id", async (request, response, next) => {
         return response.status(401).json({ error: "token missing or invalid" });
     }
 
-    const blog = {
-        title: body.title,
-        author: body.author,
-        url: body.url,
-        likes: body.likes,
-        user: body.user,
-    };
     try {
+        const blogToUpdate = await Blog.findById(request.params.id);
+
+        if (!blogToUpdate) {
+            return response.status(404).json({ error: "Blog not found" });
+        }
+
+        if (body.action !== "like" && body.action !== "unlike") {
+            return response.status(400).json({
+                error: "Blog update action must be 'like' or 'unlike'",
+            });
+        }
+        const userLikesId = blogToUpdate.userLikes.find(
+            id => id.toString() === user._id.toString()
+        );
+
+        if (userLikesId !== undefined && body.action === "like") {
+            return response
+                .status(400)
+                .json({ error: "You have already liked the blog" });
+        }
+
+        if (!userLikesId && body.action === "unlike") {
+            return response
+                .status(400)
+                .json({ error: "You have not liked the blog" });
+        }
+
+        let updatedLikes;
+        let updatedUserLikes;
+        if (body.action === "like") {
+            updatedLikes = blogToUpdate.likes + 1;
+            updatedUserLikes = blogToUpdate.userLikes.concat(user._id);
+        }
+
+        if (body.action === "unlike") {
+            updatedLikes = blogToUpdate.likes - 1;
+            updatedUserLikes = blogToUpdate.userLikes.filter(
+                id => id.toString() !== user._id.toString()
+            );
+        }
+
+        const blog = {
+            title: body.title,
+            author: body.author,
+            url: body.url,
+            likes: updatedLikes,
+            user: body.user,
+            userLikes: updatedUserLikes,
+        };
+
         const updatedBlog = await Blog.findByIdAndUpdate(
             request.params.id,
             blog,
@@ -100,7 +149,11 @@ blogsRouter.put("/:id", async (request, response, next) => {
                 context: "query",
             }
         );
-        await updatedBlog.populate("user", { username: 1, name: 1 });
+        await updatedBlog.populate("user", {
+            username: 1,
+            name: 1,
+            userLikes: 1,
+        });
         response.json(updatedBlog);
     } catch (error) {
         next(error);

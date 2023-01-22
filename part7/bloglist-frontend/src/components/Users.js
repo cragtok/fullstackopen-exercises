@@ -11,8 +11,8 @@ const Users = ({ users }) => {
 
     return (
         <div>
-            <h2>Users</h2>
-            <table>
+            <h2 className="title is-2 mt-5">Users</h2>
+            <table className="table is-striped is-bordered is-hoverable is-fullwidth">
                 <thead>
                     <tr>
                         <th>User</th>
@@ -27,9 +27,7 @@ const Users = ({ users }) => {
                                     {user.name}
                                 </Link>{" "}
                             </td>
-                            <td style={{ textAlign: "right" }}>
-                                {user.blogs.length}
-                            </td>
+                            <td>{user.blogs.length}</td>
                         </tr>
                     ))}
                 </tbody>
