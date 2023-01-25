@@ -101,6 +101,15 @@ const typeDefs = gql`
         allBooks(author: String, genre: String): [Book!]!
         allAuthors: [Author!]
     }
+
+    type Mutation {
+        addBook(
+            title: String!
+            author: String!
+            published: Int!
+            genres: [String!]!
+        ): Book
+    }
 `;
 
 const resolvers = {
@@ -109,24 +118,23 @@ const resolvers = {
         authorCount: () => authors.length,
         allBooks: (root, args) =>
             books.filter((book) => {
-                if (
-                    args.genre &&
-                    args.author &&
-                    book.author === args.author &&
-                    book.genres.includes(args.genre)
-                ) {
-                    return book;
-                }
-                if (args.author && !args.genre && book.author === args.author) {
+                if (!args.genre && !args.author) {
                     return book;
                 }
 
-                if (
-                    args.genre &&
-                    !args.author &&
-                    book.genres.includes(args.genre)
-                ) {
-                    return book;
+                if (args.genre && args.author) {
+                    return (
+                        args.author === book.author &&
+                        book.genres.includes(args.genre)
+                    );
+                }
+
+                if (args.genre && !args.author) {
+                    return book.genres.includes(args.genre);
+                }
+
+                if (args.author && !args.genre) {
+                    return args.author === book.author;
                 }
             }),
         allAuthors: () => authors,
@@ -140,6 +148,19 @@ const resolvers = {
                 }
             });
             return count;
+        },
+    },
+    Mutation: {
+        addBook: (root, args) => {
+            const newBook = { ...args, id: crypto.randomUUID() };
+            books = books.concat(newBook);
+            if (!authors.find((author) => author.name === args.author)) {
+                authors = authors.concat({
+                    name: args.author,
+                    id: crypto.randomUUID(),
+                });
+            }
+            return newBook;
         },
     },
 };
