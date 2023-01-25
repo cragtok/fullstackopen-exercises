@@ -1,4 +1,20 @@
+require("dotenv").config();
 const { ApolloServer, gql, UserInputError } = require("apollo-server");
+const mongoose = require("mongoose");
+
+const Book = require("./models/book");
+const Author = require("./models/author");
+
+const MONGODB_URI = process.env.MONGODB_URI;
+
+mongoose
+    .connect(MONGODB_URI)
+    .then(() => {
+        console.log("connected to MongoDB");
+    })
+    .catch((error) => {
+        console.log("error connection to MongoDB:", error.message);
+    });
 
 let authors = [
     {
@@ -89,9 +105,9 @@ const typeDefs = gql`
     type Book {
         title: String!
         published: Int!
-        author: String!
-        id: ID!
+        author: Author!
         genres: [String!]!
+        id: ID!
     }
 
     type Query {
@@ -107,7 +123,7 @@ const typeDefs = gql`
             author: String!
             published: Int!
             genres: [String!]!
-        ): Book
+        ): Book!
         editAuthor(name: String!, setBornTo: Int!): Author
     }
 `;
@@ -151,27 +167,19 @@ const resolvers = {
         },
     },
     Mutation: {
-        addBook: (root, args) => {
-            if (
-                !args.title ||
-                !args.published ||
-                !args.author ||
-                !args.genres ||
-                args.genres.length === 0
-            ) {
-                throw new UserInputError("Missing params for new book", {
-                    invalidArgs: { ...args },
-                });
+        addBook: async (root, args) => {
+            try {
+                let bookAuthor = await Author.findOne({ name: args.author });
+                if (!bookAuthor) {
+                    bookAuthor = new Author({ name: args.author });
+                    await bookAuthor.save();
+                }
+                const newBook = new Book({ ...args, author: bookAuthor._id });
+                await (await newBook.save()).populate("author");
+                return newBook;
+            } catch (error) {
+                throw new UserInputError(error.message, { invalidArgs: args });
             }
-            const newBook = { ...args, id: crypto.randomUUID() };
-            books = books.concat(newBook);
-            if (!authors.find((author) => author.name === args.author)) {
-                authors = authors.concat({
-                    name: args.author,
-                    id: crypto.randomUUID(),
-                });
-            }
-            return newBook;
         },
         editAuthor: (root, args) => {
             const foundAuthor = authors.find(
