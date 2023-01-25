@@ -28,7 +28,7 @@ const Authors = (props) => {
         return null;
     }
 
-    if (result.loading) {
+    if (!result.data) {
         return <div>Loading...</div>;
     }
 
@@ -54,7 +54,7 @@ const Authors = (props) => {
                 </tbody>
             </table>
             <br />
-            <EditAuthor editAuthor={editAuthorBirthYear} />
+            <EditAuthor authors={authors} editAuthor={editAuthorBirthYear} />
         </div>
     );
 };

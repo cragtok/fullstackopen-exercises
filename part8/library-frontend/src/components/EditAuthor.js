@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 
-const EditAuthor = ({ editAuthor }) => {
-    const [name, setName] = useState("");
+const EditAuthor = ({ editAuthor, authors }) => {
+    const [author, setAuthor] = useState("");
     const [birthYear, setBirthYear] = useState("");
     const handleSubmit = (e) => {
         e.preventDefault();
-        editAuthor(name, Number(birthYear));
-        setName("");
+        editAuthor(author, Number(birthYear));
         setBirthYear("");
     };
     return (
@@ -14,12 +13,19 @@ const EditAuthor = ({ editAuthor }) => {
             <h2>Set Birth Year</h2>
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label>Name: </label>
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                    />
+                    <label>Author</label>
+                    <select
+                        value={author}
+                        onChange={(e) => {
+                            setAuthor(e.target.value);
+                        }}>
+                        <option value="">Select author...</option>
+                        {authors.map((author) => (
+                            <option key={author.id} value={author.name}>
+                                {author.name}
+                            </option>
+                        ))}
+                    </select>
                 </div>
                 <div>
                     <label>Birth Year: </label>

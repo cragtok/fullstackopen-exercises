@@ -156,7 +156,8 @@ const resolvers = {
                 !args.title ||
                 !args.published ||
                 !args.author ||
-                !args.genres
+                !args.genres ||
+                args.genres.length === 0
             ) {
                 throw new UserInputError("Missing params for new book", {
                     invalidArgs: { ...args },
