@@ -1,5 +1,4 @@
 const { ApolloServer, gql } = require("apollo-server");
-const { argsToArgsConfig } = require("graphql/type/definition");
 
 let authors = [
     {
@@ -161,6 +160,7 @@ const resolvers = {
                     id: crypto.randomUUID(),
                 });
             }
+            console.log(newBook);
             return newBook;
         },
         editAuthor: (root, args) => {
