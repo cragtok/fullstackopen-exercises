@@ -10,9 +10,17 @@ const NewBook = (props) => {
     const [genre, setGenre] = useState("");
     const [genres, setGenres] = useState([]);
 
+    const [error, setError] = useState("");
+
     const [createBook] = useMutation(CREATE_PERSON, {
         refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }],
-        onError: (error) => console.error(error),
+        onError: (error) => {
+            setError(error.graphQLErrors[0].message);
+            console.log(error.graphQLErrors[0]);
+            setTimeout(() => {
+                setError("");
+            }, 4000);
+        },
     });
 
     if (!props.show) {
@@ -38,6 +46,7 @@ const NewBook = (props) => {
 
     return (
         <div>
+            {error && <p style={{ color: "red" }}>{error}</p>}
             <form onSubmit={submit}>
                 <div>
                     title

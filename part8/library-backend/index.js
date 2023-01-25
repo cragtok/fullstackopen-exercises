@@ -1,4 +1,4 @@
-const { ApolloServer, gql } = require("apollo-server");
+const { ApolloServer, gql, UserInputError } = require("apollo-server");
 
 let authors = [
     {
@@ -152,6 +152,16 @@ const resolvers = {
     },
     Mutation: {
         addBook: (root, args) => {
+            if (
+                !args.title ||
+                !args.published ||
+                !args.author ||
+                !args.genres
+            ) {
+                throw new UserInputError("Missing params for new book", {
+                    invalidArgs: { ...args },
+                });
+            }
             const newBook = { ...args, id: crypto.randomUUID() };
             books = books.concat(newBook);
             if (!authors.find((author) => author.name === args.author)) {
@@ -160,7 +170,6 @@ const resolvers = {
                     id: crypto.randomUUID(),
                 });
             }
-            console.log(newBook);
             return newBook;
         },
         editAuthor: (root, args) => {

@@ -1,8 +1,28 @@
-import { useQuery } from "@apollo/client";
-import { ALL_AUTHORS } from "../queries";
+import { useEffect, useState } from "react";
+import { useQuery, useMutation } from "@apollo/client";
+import { ALL_AUTHORS, EDIT_AUTHOR } from "../queries";
+
+import EditAuthor from "./EditAuthor";
 
 const Authors = (props) => {
     const result = useQuery(ALL_AUTHORS);
+    const [editAuthor, mutationResult] = useMutation(EDIT_AUTHOR);
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        if (mutationResult.data && mutationResult.data.editAuthor === null) {
+            setError("Person not found");
+        }
+        const timerRef = setTimeout(() => {
+            setError("");
+        }, 3000);
+
+        return () => clearTimeout(timerRef);
+    }, [mutationResult.data]);
+
+    const editAuthorBirthYear = (name, birthYear) => {
+        editAuthor({ variables: { name, setBornTo: birthYear } });
+    };
 
     if (!props.show) {
         return null;
@@ -11,11 +31,12 @@ const Authors = (props) => {
     if (result.loading) {
         return <div>Loading...</div>;
     }
-    const authors = [...result.data.allAuthors];
 
+    const authors = [...result.data.allAuthors];
     return (
         <div>
             <h2>authors</h2>
+            {error && <p style={{ color: "red" }}>{error}</p>}
             <table>
                 <tbody>
                     <tr>
@@ -32,6 +53,8 @@ const Authors = (props) => {
                     ))}
                 </tbody>
             </table>
+            <br />
+            <EditAuthor editAuthor={editAuthorBirthYear} />
         </div>
     );
 };
