@@ -61,28 +61,32 @@ const resolvers = {
             return authors.length;
         },
         allBooks: async (root, args) => {
-            if (!args.author && !args.genre) {
-                return await Book.find({}).populate("author");
-            }
-            if (args.author && !args.genre) {
-                const bookAuthor = await Author.find({ name: args.author });
-                return await Book.find({ author: bookAuthor }).populate(
-                    "author"
-                );
-            }
+            try {
+                if (!args.author && !args.genre) {
+                    return await Book.find({}).populate("author");
+                }
+                if (args.author && !args.genre) {
+                    const bookAuthor = await Author.find({ name: args.author });
+                    return await Book.find({ author: bookAuthor }).populate(
+                        "author"
+                    );
+                }
 
-            if (args.genre && !args.author) {
-                return await Book.find({
-                    genres: { $in: [args.genre] },
-                }).populate("author");
-            }
+                if (args.genre && !args.author) {
+                    return await Book.find({
+                        genres: { $in: [args.genre] },
+                    }).populate("author");
+                }
 
-            if (args.genre && args.author) {
-                const bookAuthor = await Author.find({ name: args.author });
-                return await Book.find({
-                    genres: { $in: [args.genre] },
-                    author: bookAuthor,
-                }).populate("author");
+                if (args.genre && args.author) {
+                    const bookAuthor = await Author.find({ name: args.author });
+                    return await Book.find({
+                        genres: { $in: [args.genre] },
+                        author: bookAuthor,
+                    }).populate("author");
+                }
+            } catch (error) {
+                console.log(error);
             }
         },
         allAuthors: async () => await Author.find({}),
