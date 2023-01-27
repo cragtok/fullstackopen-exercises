@@ -12,7 +12,7 @@ const Books = (props) => {
             genre: filterTerm,
         },
         skip: !filterTerm,
-        fetchPolicy: "no-cache",
+        fetchPolicy: "network-only",
     });
 
     if (!props.show) {
