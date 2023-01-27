@@ -2,23 +2,30 @@ import { useQuery } from "@apollo/client";
 import { useState } from "react";
 import { ALL_BOOKS } from "../queries";
 const Books = (props) => {
-    const result = useQuery(ALL_BOOKS);
     const [filterValue, setFilterValue] = useState("");
     const [filterTerm, setFilterTerm] = useState("");
+
+    const result = useQuery(ALL_BOOKS);
+
+    const filteredResult = useQuery(ALL_BOOKS, {
+        variables: {
+            genre: filterTerm,
+        },
+        skip: !filterTerm,
+        fetchPolicy: "no-cache",
+    });
 
     if (!props.show) {
         return null;
     }
 
-    if (result.loading) {
+    if (result.loading || filteredResult.loading) {
         return <div>Loading...</div>;
     }
 
-    const books = result.data.allBooks
-        .map((book) => book)
-        .filter((book) =>
-            filterTerm ? book.genres.includes(filterTerm.toLowerCase()) : book
-        );
+    const books = (filterTerm ? filteredResult : result).data.allBooks.map(
+        (book) => book
+    );
 
     return (
         <div>
