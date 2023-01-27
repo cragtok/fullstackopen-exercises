@@ -3,7 +3,6 @@ const gql = require("graphql-tag");
 const typeDefs = gql`
     type Author {
         name: String!
-
         born: Int
         id: ID!
         bookCount: Int!

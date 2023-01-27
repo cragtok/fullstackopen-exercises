@@ -11,7 +11,7 @@ import LoginForm from "./components/LoginForm";
 import NewBook from "./components/NewBook";
 import Recommended from "./components/Recommended";
 
-import { BOOK_ADDED } from "./queries";
+import { ALL_BOOKS, BOOK_ADDED } from "./queries";
 
 const App = () => {
     const [page, setPage] = useState("authors");
@@ -21,7 +21,13 @@ const App = () => {
 
     useSubscription(BOOK_ADDED, {
         onData: ({ data }) => {
-            window.alert(`New Book ${data.data.bookAdded.title} added!`);
+            const addedBook = data.data.bookAdded;
+            window.alert(`New Book ${addedBook.title} added!`);
+            client.cache.updateQuery({ query: ALL_BOOKS }, ({ allBooks }) => {
+                return {
+                    allBooks: allBooks.concat(addedBook),
+                };
+            });
         },
     });
 
