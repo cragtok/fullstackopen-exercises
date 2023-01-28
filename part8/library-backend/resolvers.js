@@ -55,15 +55,22 @@ const resolvers = {
                 });
             }
         },
-        allAuthors: async () => await Author.find({}),
+        allAuthors: async () => await Author.find({}).populate("books"),
         me: (root, args, context) => {
             return context.currentUser;
         },
     },
     Author: {
-        bookCount: (root) => {
-            let count = 0;
-            return count;
+        bookCount: async (root) => {
+            try {
+                return root.books.length;
+            } catch (error) {
+                throw new GraphQLError("Internal Server Error", {
+                    extensions: {
+                        code: ApolloServerErrorCode.INTERNAL_SERVER_ERROR,
+                    },
+                });
+            }
         },
     },
     Mutation: {
@@ -80,11 +87,14 @@ const resolvers = {
             try {
                 let bookAuthor = await Author.findOne({ name: args.author });
                 if (!bookAuthor) {
-                    bookAuthor = new Author({ name: args.author });
-                    await bookAuthor.save();
+                    bookAuthor = await new Author({ name: args.author }).save();
                 }
+
                 const newBook = new Book({ ...args, author: bookAuthor._id });
                 await (await newBook.save()).populate("author");
+
+                bookAuthor.books = bookAuthor.books.concat(newBook);
+                await bookAuthor.save();
 
                 pubsub.publish("BOOK_ADDED", { bookAdded: newBook });
                 return newBook;
@@ -109,7 +119,7 @@ const resolvers = {
             try {
                 const foundAuthor = await Author.findOne({ name: args.name });
                 foundAuthor.born = args.setBornTo;
-                await foundAuthor.save();
+                await (await foundAuthor.save()).populate("books");
                 return foundAuthor;
             } catch (error) {
                 throw new GraphQLError(error.message, {
