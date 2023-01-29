@@ -1,8 +1,12 @@
 import patientsData from "../data/patients.json";
-
 import { Patient, NewPatient } from "../types";
+import toNewPatient from "../utils";
 
-const patients: Array<Patient> = patientsData;
+const patients: Array<Patient> = patientsData.map((patient) => {
+    const newPatient = toNewPatient(patient) as Patient;
+    newPatient.id = patient.id;
+    return newPatient;
+});
 
 const getAll = (): Array<Patient> => {
     return patients;
