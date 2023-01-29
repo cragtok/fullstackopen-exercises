@@ -8,6 +8,40 @@ interface Result {
     average: number;
 }
 
+interface exerciseArgs {
+    targetValue: number;
+    exerciseValues: Array<number>;
+}
+
+const parseArgumentsExercise = (args: Array<string>): exerciseArgs => {
+    if (args.length < 10) {
+        throw new Error("Not enough arguments");
+    }
+    if (args.length > 10) {
+        throw new Error("Too many arguments");
+    }
+
+    let targetValue = Number(args[2]);
+    if (isNaN(targetValue)) {
+        throw new Error(
+            "Invalid input: Target exercise hour value must be a number"
+        );
+    }
+
+    let exerciseValues = [];
+
+    for (let i = 3; i < args.length; i++) {
+        if (isNaN(Number(args[i]))) {
+            throw new Error("Invalid input: Exercise values must be numbers");
+        }
+        exerciseValues.push(Number(args[i]));
+    }
+
+    return {
+        targetValue,
+        exerciseValues,
+    };
+};
 const calculateExercises = (
     exerciseHours: Array<number>,
     target: number
@@ -51,10 +85,10 @@ const calculateExercises = (
 };
 
 try {
-    console.log(calculateExercises([3, 0, 2, 4.5, 0, 3, 1], 2));
-    console.log(calculateExercises([0, 0, 0], 2));
-    console.log(calculateExercises([2, 2, 1, 1, 1, 1], 1));
-    console.log(calculateExercises([], 0));
+    const { targetValue, exerciseValues } = parseArgumentsExercise(
+        process.argv
+    );
+    console.log(calculateExercises(exerciseValues, targetValue));
 } catch (error: unknown) {
     if (error instanceof Error) {
         console.log(`Error: ${error.message}`);
