@@ -21,14 +21,14 @@ const parseArgumentsExercise = (args: Array<string>): exerciseArgs => {
         throw new Error("Too many arguments");
     }
 
-    let targetValue = Number(args[2]);
+    const targetValue = Number(args[2]);
     if (isNaN(targetValue)) {
         throw new Error(
             "Invalid input: Target exercise hour value must be a number"
         );
     }
 
-    let exerciseValues = [];
+    const exerciseValues = [];
 
     for (let i = 3; i < args.length; i++) {
         if (isNaN(Number(args[i]))) {
