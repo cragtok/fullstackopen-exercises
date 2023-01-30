@@ -1,18 +1,46 @@
 import React from "react";
-import { Course } from "../types";
+import { CoursePart } from "../types";
+import Part from "./Part";
 
-const Content = ({ courseParts }: { courseParts: Array<Course> }) => {
+const Content = ({ courseParts }: { courseParts: Array<CoursePart> }) => {
     return (
         <div>
-            <p>
-                {courseParts[0].name} {courseParts[0].exerciseCount}
-            </p>
-            <p>
-                {courseParts[1].name} {courseParts[1].exerciseCount}
-            </p>
-            <p>
-                {courseParts[2].name} {courseParts[2].exerciseCount}
-            </p>
+            {courseParts.map((part) => {
+                let coursePart;
+                switch (part.type) {
+                    case "groupProject":
+                        coursePart = {
+                            ...part,
+                            groupProjectCount: part.groupProjectCount,
+                        };
+                        break;
+                    case "submission":
+                        coursePart = {
+                            ...part,
+                            exerciseSubmissionLink: part.exerciseSubmissionLink,
+                        };
+                        break;
+                    case "special":
+                        coursePart = {
+                            ...part,
+                            requirements: [...part.requirements],
+                        };
+                        break;
+                    case "normal":
+                        coursePart = part;
+                        break;
+                    default:
+                        throw new Error(
+                            `Unhandled discriminated union member: ${JSON.stringify(
+                                part
+                            )}`
+                        );
+                }
+
+                return (
+                    <Part key={crypto.randomUUID()} coursePart={coursePart} />
+                );
+            })}
         </div>
     );
 };
