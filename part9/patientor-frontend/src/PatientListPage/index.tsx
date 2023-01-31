@@ -50,7 +50,7 @@ const PatientListPage = () => {
     React.useEffect(() => {
         void axios.get<void>(`${apiBaseUrl}/ping`);
 
-        const fetchPatientList = async () => {
+        const fetchData = async () => {
             try {
                 const { data: patientListFromApi } = await axios.get<Patient[]>(
                     `${apiBaseUrl}/patients`
@@ -60,7 +60,7 @@ const PatientListPage = () => {
                 console.error(e);
             }
         };
-        void fetchPatientList();
+        void fetchData();
     }, [dispatch]);
 
     return (

@@ -9,7 +9,7 @@ import axios from "axios";
 
 const PatientInfoPage = () => {
     const { id } = useParams<{ id: string }>();
-    const [{ patients }, dispatch] = useStateValue();
+    const [{ patients, diagnoses }, dispatch] = useStateValue();
 
     const [patient, setPatient] = useState<Patient | null>(null);
 
@@ -63,7 +63,7 @@ const PatientInfoPage = () => {
     };
     */
 
-    if (!patient) {
+    if (!patient || JSON.stringify(diagnoses) === "{}") {
         return <p>Loading...</p>;
     }
 
@@ -80,6 +80,7 @@ const PatientInfoPage = () => {
             </Typography>
             <br />
             <Typography variant="h5">entries</Typography>
+            <br />
             {patient.entries.map((entry) => (
                 <div key={entry.id}>
                     <Typography variant="body1">
@@ -90,7 +91,8 @@ const PatientInfoPage = () => {
                             {entry.diagnosisCodes.map((diagnosisCode, idx) => (
                                 <li key={idx}>
                                     <Typography variant="body1">
-                                        {diagnosisCode}
+                                        {diagnosisCode}{" "}
+                                        {diagnoses[diagnosisCode || ""].name}
                                     </Typography>
                                 </li>
                             ))}
