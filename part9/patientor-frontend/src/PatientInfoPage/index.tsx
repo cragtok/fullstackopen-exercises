@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 
 import { Patient } from "../types";
 import { apiBaseUrl } from "../constants";
-import { useStateValue } from "../state";
+import { useStateValue, updatePatient } from "../state";
 import axios from "axios";
 
 const PatientInfoPage = () => {
@@ -23,10 +23,7 @@ const PatientInfoPage = () => {
                         `${apiBaseUrl}/patients/${id || ""}`
                     );
                 if (fetchedPatient && !cancelRequest) {
-                    dispatch({
-                        type: "UPDATE_PATIENT",
-                        payload: fetchedPatient,
-                    });
+                    dispatch(updatePatient(fetchedPatient));
                     setPatient(fetchedPatient);
                 }
             } catch (error) {

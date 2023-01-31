@@ -7,7 +7,7 @@ import AddPatientModal from "../AddPatientModal";
 import { Patient } from "../types";
 import { apiBaseUrl } from "../constants";
 import HealthRatingBar from "../components/HealthRatingBar";
-import { useStateValue } from "../state";
+import { useStateValue, addPatient, setPatientList } from "../state";
 import { TableCell } from "@material-ui/core";
 import { TableRow } from "@material-ui/core";
 import { TableBody } from "@material-ui/core";
@@ -32,7 +32,7 @@ const PatientListPage = () => {
                 `${apiBaseUrl}/patients`,
                 values
             );
-            dispatch({ type: "ADD_PATIENT", payload: newPatient });
+            dispatch(addPatient(newPatient));
             closeModal();
         } catch (e: unknown) {
             if (axios.isAxiosError(e)) {
@@ -47,6 +47,21 @@ const PatientListPage = () => {
             }
         }
     };
+    React.useEffect(() => {
+        void axios.get<void>(`${apiBaseUrl}/ping`);
+
+        const fetchPatientList = async () => {
+            try {
+                const { data: patientListFromApi } = await axios.get<Patient[]>(
+                    `${apiBaseUrl}/patients`
+                );
+                dispatch(setPatientList(patientListFromApi));
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        void fetchPatientList();
+    }, [dispatch]);
 
     return (
         <div className="App">
