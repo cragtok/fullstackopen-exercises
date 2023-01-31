@@ -1,11 +1,10 @@
-import patientsData from "../data/patients.json";
+import patientsData from "../data/patients";
 import { Patient, NewPatient } from "../types";
 import toNewPatient from "../utils";
 
 const patients: Array<Patient> = patientsData.map((patient) => {
     const newPatient = toNewPatient(patient) as Patient;
     newPatient.id = patient.id;
-    newPatient.entries = patient.entries;
     return newPatient;
 });
 
@@ -22,7 +21,7 @@ const addPatient = (newPatient: NewPatient): Patient => {
     const patientToAdd = {
         ...newPatient,
         id: crypto.randomUUID(),
-        entries: [],
+        entries: [...newPatient.entries],
     };
     patients.push(patientToAdd);
     return patientToAdd;
@@ -36,7 +35,7 @@ const getAllNonSensitive = (): Omit<Patient, "ssn">[] => {
             dateOfBirth,
             gender,
             occupation,
-            entries,
+            entries: [...entries],
         })
     );
 };
