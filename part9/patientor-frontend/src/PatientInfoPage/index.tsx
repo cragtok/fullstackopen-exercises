@@ -42,6 +42,27 @@ const PatientInfoPage = () => {
         };
     }, []);
 
+    /*
+    const renderPatientEntries = (entries: Entry[]) => {
+        entries.map((entry) => {
+            switch (entry.type) {
+                case "OccupationalHealthcare":
+                    break;
+                case "Hospital":
+                    break;
+                case "HealthCheck":
+                    break;
+                default:
+                    throw new Error(
+                        `Unhandled discriminated union member: ${JSON.stringify(
+                            entry
+                        )}`
+                    );
+            }
+        });
+    };
+    */
+
     if (!patient) {
         return <p>Loading...</p>;
     }
@@ -57,6 +78,26 @@ const PatientInfoPage = () => {
             <Typography variant="body1">
                 Occupation: {patient.occupation}
             </Typography>
+            <br />
+            <Typography variant="h5">entries</Typography>
+            {patient.entries.map((entry) => (
+                <div key={entry.id}>
+                    <Typography variant="body1">
+                        {entry.date} {entry.description}
+                    </Typography>
+                    {entry.diagnosisCodes && entry.diagnosisCodes.length > 0 ? (
+                        <ul>
+                            {entry.diagnosisCodes.map((diagnosisCode, idx) => (
+                                <li key={idx}>
+                                    <Typography variant="body1">
+                                        {diagnosisCode}
+                                    </Typography>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : null}
+                </div>
+            ))}
         </div>
     );
 };
