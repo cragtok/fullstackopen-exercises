@@ -24,6 +24,7 @@ export enum Gender {
 }
 
 // Entry
+
 export type Entry =
     | HealthCheckEntry
     | OccupationalHealthcareEntry
@@ -68,7 +69,7 @@ interface HospitalEntry extends BaseEntry {
     discharge: Discharge;
 }
 
-interface BaseEntry {
+export interface BaseEntry {
     id: string;
     date: string;
     description: string;

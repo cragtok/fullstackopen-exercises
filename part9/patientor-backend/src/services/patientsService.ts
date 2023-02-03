@@ -1,6 +1,7 @@
 import patientsData from "../data/patients";
-import { Patient, NewPatient } from "../types";
-import toNewPatient from "../utils";
+import { Patient, NewPatient, Entry } from "../types";
+import toNewPatient from "../utils/patient";
+import toNewEntry from "../utils/entry";
 
 const patients: Array<Patient> = patientsData.map((patient) => {
     const newPatient = toNewPatient(patient) as Patient;
@@ -15,6 +16,12 @@ const getAll = (): Array<Patient> => {
 const getOne = (patientId: string): Patient | undefined => {
     const foundPatient = patients.find((patient) => patient.id === patientId);
     return foundPatient;
+};
+
+const addPatientEntry = (entry: Entry, patient: Patient): Entry => {
+    const newEntry = toNewEntry({ ...entry, id: crypto.randomUUID() });
+    patient.entries = patient.entries.concat(newEntry);
+    return newEntry;
 };
 
 const addPatient = (newPatient: NewPatient): Patient => {
@@ -45,4 +52,5 @@ export default {
     getOne,
     getAllNonSensitive,
     addPatient,
+    addPatientEntry,
 };
