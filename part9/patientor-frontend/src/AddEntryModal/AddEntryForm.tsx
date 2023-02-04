@@ -60,13 +60,16 @@ export const AddEntryForm = ({ onSubmit, onCancel }: Props) => {
                 diagnosisCodes: [],
             }}
             onSubmit={(values) => {
+                const baseObj = {
+                    date: values.date,
+                    description: values.description,
+                    specialist: values.specialist,
+                    diagnosisCodes: values.diagnosisCodes,
+                };
                 switch (values.type) {
                     case "Hospital":
                         const hospitalEntry: Omit<HospitalEntry, "id"> = {
-                            date: values.date,
-                            description: values.description,
-                            specialist: values.specialist,
-                            diagnosisCodes: values.diagnosisCodes,
+                            ...baseObj,
                             type: "Hospital",
                             discharge: {
                                 date: values.dischargeDate,
@@ -77,10 +80,7 @@ export const AddEntryForm = ({ onSubmit, onCancel }: Props) => {
                         break;
                     case "OccupationalHealthcare":
                         const ohc: Omit<OccupationalHealthcareEntry, "id"> = {
-                            date: values.date,
-                            description: values.description,
-                            specialist: values.specialist,
-                            diagnosisCodes: values.diagnosisCodes,
+                            ...baseObj,
                             type: "OccupationalHealthcare",
                             employerName: values.employerName,
                             sickLeave: {
@@ -92,10 +92,7 @@ export const AddEntryForm = ({ onSubmit, onCancel }: Props) => {
                         break;
                     case "HealthCheck":
                         const hc: Omit<HealthCheckEntry, "id"> = {
-                            date: values.date,
-                            description: values.description,
-                            specialist: values.specialist,
-                            diagnosisCodes: values.diagnosisCodes,
+                            ...baseObj,
                             type: "HealthCheck",
                             healthCheckRating: values.healthCheckRating,
                         };
