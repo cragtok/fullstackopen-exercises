@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { ErrorMessage, Field, FieldProps, FormikProps } from "formik";
 import {
     Select,
@@ -7,13 +6,19 @@ import {
     TextField as TextFieldMUI,
     Typography,
 } from "@material-ui/core";
-import { Diagnosis, Gender } from "../types";
+import { EntryType, Diagnosis, HealthCheckRating } from "../types";
 import { InputLabel } from "@material-ui/core";
+import { useState } from "react";
 import Input from "@material-ui/core/Input";
 
-// structure of a single option
-export type GenderOption = {
-    value: Gender;
+// structure of a single entry
+export type EntryOption = {
+    value: EntryType;
+    label: string;
+};
+
+export type HealthCheckRatingOption = {
+    value: HealthCheckRating;
     label: string;
 };
 
@@ -21,7 +26,7 @@ export type GenderOption = {
 type SelectFieldProps = {
     name: string;
     label: string;
-    options: GenderOption[];
+    options: EntryOption[] | HealthCheckRatingOption[];
 };
 
 const FormikSelect = ({ field, ...props }: FieldProps) => (
@@ -65,9 +70,6 @@ export const TextField = ({ field, label, placeholder }: TextProps) => (
     </div>
 );
 
-/*
-  for exercises 9.24.-
-*/
 interface NumberProps extends FieldProps {
     label: string;
     min: number;

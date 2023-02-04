@@ -2,9 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Typography } from "@material-ui/core";
 import { useParams } from "react-router-dom";
 
+import { EntryFormValues } from "../AddEntryModal/AddEntryForm";
+import AddEntryModal from "../AddEntryModal";
+
 import { Patient, Entry } from "../types";
 import { apiBaseUrl } from "../constants";
-import { useStateValue, updatePatient } from "../state";
+import { useStateValue, updatePatient, addEntry } from "../state";
+import { Button } from "@material-ui/core";
 import { LocalHospital, Work, CheckBox } from "@material-ui/icons";
 import axios from "axios";
 
@@ -13,6 +17,8 @@ const PatientInfoPage = () => {
     const [{ patients, diagnoses }, dispatch] = useStateValue();
 
     const [patient, setPatient] = useState<Patient | null>(null);
+    const [modalOpen, setModalOpen] = useState<boolean>(false);
+    const [error, setError] = React.useState<string>();
 
     useEffect(() => {
         let cancelRequest = false;
@@ -76,7 +82,7 @@ const PatientInfoPage = () => {
                 case "Hospital":
                     return (
                         <>
-                            <Typography variant="body1">Discharge: </Typography>
+                            <Typography variant="body1">Discharge </Typography>
                             <Typography variant="body1">
                                 Date: {entry.discharge.date}
                             </Typography>
@@ -144,6 +150,35 @@ const PatientInfoPage = () => {
         ));
     };
 
+    const submitNewEntry = async (values: EntryFormValues) => {
+        try {
+            const { data: newEntry } = await axios.post<Entry>(
+                `${apiBaseUrl}/patients/${id || ""}/entries`,
+                values
+            );
+
+            dispatch(addEntry(newEntry, id || ""));
+            closeModal();
+        } catch (e: unknown) {
+            if (axios.isAxiosError(e)) {
+                console.error(e?.response?.data || "Unrecognized axios error");
+                setError(
+                    String(e?.response?.data?.error) ||
+                        "Unrecognized axios error"
+                );
+            } else {
+                console.error("Unknown error", e);
+                setError("Unknown error");
+            }
+        }
+    };
+
+    const openModal = (): void => setModalOpen(true);
+
+    const closeModal = (): void => {
+        setModalOpen(false);
+        setError(undefined);
+    };
     if (!patient || JSON.stringify(diagnoses) === "{}") {
         return <p>Loading...</p>;
     }
@@ -160,7 +195,18 @@ const PatientInfoPage = () => {
                 Occupation: {patient.occupation}
             </Typography>
             <br />
-            <Typography variant="h5">Entries</Typography>
+            <Typography variant="h5">
+                Entries{" "}
+                <Button variant="contained" onClick={() => openModal()}>
+                    New Entry
+                </Button>
+            </Typography>
+            <AddEntryModal
+                modalOpen={modalOpen}
+                onSubmit={submitNewEntry}
+                error={error}
+                onClose={closeModal}
+            />
             <br />
             {renderPatientEntries(patient.entries)}
         </div>

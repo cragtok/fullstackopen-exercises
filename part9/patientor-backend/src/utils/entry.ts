@@ -84,7 +84,7 @@ const toNewEntry = (fields: Fields): Entry => {
     const specialist = parseStringField(fields.specialist, "specialist");
     const type = parseStringField(fields.type, "type");
     let diagnosisCodes;
-    if (fields.diagnosisCodes) {
+    if (fields.diagnosisCodes && fields.diagnosisCodes.length > 0) {
         diagnosisCodes = parseDiagnosisFields(fields.diagnosisCodes);
     }
 
