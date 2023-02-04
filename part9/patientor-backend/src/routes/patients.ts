@@ -25,11 +25,11 @@ router.post("/:id/entries", (req, res) => {
             const newEntry = patientsService.addPatientEntry(req.body, patient);
             res.json(newEntry);
         } catch (error) {
-            let errorMessage = "Something went wrong.";
+            let errorMessage = "";
             if (error instanceof Error) {
-                errorMessage += ` Error: ${error}`;
+                errorMessage += `${error}`;
             }
-            res.status(400).send(errorMessage);
+            res.status(400).json({ error: errorMessage });
         }
     } else {
         res.status(404).json({ error: "Patient not found" });

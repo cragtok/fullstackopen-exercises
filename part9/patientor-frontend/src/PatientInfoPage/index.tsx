@@ -158,12 +158,16 @@ const PatientInfoPage = () => {
             );
 
             dispatch(addEntry(newEntry, id || ""));
+            const updatedPatient = {
+                ...patient,
+                entries: patient?.entries.concat(newEntry),
+            };
+            setPatient(updatedPatient as Patient);
             closeModal();
         } catch (e: unknown) {
             if (axios.isAxiosError(e)) {
-                console.error(e?.response?.data || "Unrecognized axios error");
                 setError(
-                    String(e?.response?.data?.error) ||
+                    String(e?.response?.data.error) ||
                         "Unrecognized axios error"
                 );
             } else {
